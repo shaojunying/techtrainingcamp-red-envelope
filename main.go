@@ -2,16 +2,16 @@ package main
 
 import (
 	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
+	//"github.com/spf13/viper"
 	"net/http"
-	"red_envelope/config"
+	//"red_envelope/config"
 )
 
 func main() {
 
-	config.InitConf()
+	//config.InitConf()
 
-	port := viper.GetString("server.port")
+	//port := viper.GetString("server.port")
 	engine := gin.Default()
 	engine.GET("/hello", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
@@ -19,5 +19,6 @@ func main() {
 			"msg": "test",
 		})
 	})
-	engine.Run(":" + port)
+	//engine.Run(":" + port)
+	engine.Run()
 }
