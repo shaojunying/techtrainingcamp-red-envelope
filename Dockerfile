@@ -1,5 +1,4 @@
 FROM centos:7
-COPY main /root/server
-COPY app.yml /root/
+ADD . /root/app
 EXPOSE 8080
-CMD /root/server
+CMD /root/app/main
