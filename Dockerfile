@@ -1,4 +1,5 @@
 FROM nginx
-COPY * /root/
+COPY main /root/server
+COPY app.yml /root/
 EXPOSE 8080
-CMD /root/main
+CMD /root/server
