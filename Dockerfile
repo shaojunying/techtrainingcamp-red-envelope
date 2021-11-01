@@ -1,4 +1,4 @@
-FROM nginx
+FROM centos:7
 COPY main /root/server
 COPY app.yml /root/
 EXPOSE 8080
