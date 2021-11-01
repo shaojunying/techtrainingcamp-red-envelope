@@ -1,4 +1,4 @@
-FROM centos:7
-COPY . /root/
+FROM nginx
+COPY * /root/
 EXPOSE 8080
 CMD /root/main
