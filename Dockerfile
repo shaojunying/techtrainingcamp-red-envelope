@@ -1,4 +1,7 @@
 FROM centos:7
-ADD . /root/app
+COPY config /root/
+COPY database /root/
+COPY main /root/main
+COPY app.yml /root/
 EXPOSE 8080
-CMD /root/app/main
+CMD /root/main
