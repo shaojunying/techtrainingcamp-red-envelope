@@ -1,4 +1,4 @@
 FROM centos:7
-COPY main /root/server
+COPY . /root/
 EXPOSE 8080
-CMD /root/server
+CMD /root/main
