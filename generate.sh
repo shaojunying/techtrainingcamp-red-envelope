@@ -1,5 +1,5 @@
 #! bin/bash
-set -ex
+set -e
 
 username="root" 
 password="root"
@@ -17,19 +17,19 @@ echo "数据库创建成功"
 
 #创建表
 create_table_sql1="create table if not exists user (
-	id int not null auto_increment,
+	uid int not null auto_increment,
 	amount int default null,
 	if_get bool  default false,
-	primary key (id)
+	primary key (uid)
 )ENGINE=innoDB DEFAULT CHARSET=utf8;"
 
 create_table_sql2="create table if not exists red_envelope (
-	id int not null auto_increment,
-	user_id int default null,
+	envelope_id int not null auto_increment,
+	uid int default null,
 	if_open bool default false,
 	money int default null,
-	open_time timestamp default null,
-	primary key(id)
+	open_time timestamp DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+	primary key(envelope_id)
 )ENGINE=innoDB DEFAULT CHARSET=utf8;"
 
 mysql -u${username} -p${password} -D${dbname} -e "${create_table_sql1} ${create_table_sql2}"
@@ -43,10 +43,10 @@ insert_user_2="insert user(amount, if_get) values(20, true);"
 insert_user_3="insert user(amount, if_get) values(15, false);"
 insert_user_4="insert user(amount, if_get) values(40, true);"
 
-insert_envelope_1="insert red_envelope(user_id, if_open, money, open_time) values(1, true, 5, '2021-09-12 13:40:33');"
+insert_envelope_1="insert red_envelope(uid, if_open, money) values(1, true, 5);"
 insert_envelope_2="insert red_envelope(if_open, money) values(false, 30);"
-insert_envelope_3="insert red_envelope(user_id, if_open, money, open_time) values(2, true, 20, '2021-10-12 15:34:36');"
-insert_envelope_4="insert red_envelope(user_id, if_open, money, open_time) values(4, true, 15, '2021-10-30 08:23:47');"
+insert_envelope_3="insert red_envelope(uid, if_open, money) values(2, true, 20);"
+insert_envelope_4="insert red_envelope(uid, if_open, money) values(4, true, 15);"
 
 
 mysql -u${username} -p${password} -D${dbname} -e "${insert_user_1} ${insert_user_2} ${insert_user_3} ${insert_user_4}

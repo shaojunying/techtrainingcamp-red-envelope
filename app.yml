@@ -1,2 +1,21 @@
 server:
   port: 8080
+database:
+  driverName: mysql
+  userName: root
+  password: root
+  host: localhost
+  database: red_envelope_rain
+  #空闲时的最大连接数
+  MaxOpenConns: 100
+  #与数据库的最大连接数
+  MaxIdleConns: 100
+  #每个连接的生命周期 单位秒
+  ConnMaxLifeTime: 300
+snatchProbability: 70
+snatchMaxCount: 5
+totalNum: 100
+#金额单位: 分
+totalAmount: 100000
+minAmount: 100
+maxAmount: 3000
