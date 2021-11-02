@@ -16,7 +16,7 @@ func main() {
 	engine.GET("/hello", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"code": 0,
-			"msg": "test",
+			"msg": "Hello World!!!",
 		})
 	})
 	engine.Run(":" + port)
