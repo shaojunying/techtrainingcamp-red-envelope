@@ -1,7 +1,8 @@
 FROM centos:7
 RUN mkdir -p /root/config
-ADD config /root/config
-COPY database /root/
+COPY config /root/config/
+RUN mkdir -p /root/database
+COPY database /root/database/
 COPY main /root/main
 COPY app.yml /root/
 EXPOSE 8080
