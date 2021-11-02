@@ -1,5 +1,6 @@
 FROM centos:7
-COPY config /root/
+RUN mkdir -p /root/config
+ADD config /root/config
 COPY database /root/
 COPY main /root/main
 COPY app.yml /root/
