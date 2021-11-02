@@ -1,5 +1,6 @@
 FROM centos:7
-COPY red_envelope /root/server
-COPY app.yml /root/
+WORKDIR /root/app
+COPY red_envelope server
+COPY app.yml ./
 EXPOSE 8080
-CMD /root/server
+CMD server
