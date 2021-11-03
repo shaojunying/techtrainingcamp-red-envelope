@@ -8,8 +8,8 @@ import (
 
 func InitConf() {
 	wordDir, _ := os.Getwd()
-	viper.SetConfigName("app")
-	viper.SetConfigType("yml")
+	viper.SetConfigName("config")
+	viper.SetConfigType("yaml")
 	viper.AddConfigPath(wordDir)
 	err := viper.ReadInConfig()
 	if err != nil {

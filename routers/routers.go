@@ -2,7 +2,7 @@ package routers
 
 import (
 	"github.com/gin-gonic/gin"
-	"red_envelope/api/snatch"
+	"red_envelope/api/redenvelope"
 )
 
 func InitRouter() *gin.Engine {
@@ -15,5 +15,5 @@ func InitRouter() *gin.Engine {
 // 设置路由
 func setUpRouter(router *gin.Engine) {
 	api := router.Group("/")
-	snatch.RegisterRedEnvelopeRouter(api.Group("/snatch"))
+	redenvelope.RegisterRedEnvelopeRouter(api.Group("/redenvelope"))
 }

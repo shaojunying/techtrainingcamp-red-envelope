@@ -1,4 +1,4 @@
-package snatch
+package redenvelope
 
 import (
 	"fmt"
@@ -8,12 +8,6 @@ import (
 	"net/http"
 	"time"
 )
-
-type successMsg struct {
-	EnvelopeID int `json:"envelope_id"`
-	MaxCount   int `json:"max_count"`
-	CurCount   int `json:"cur_count"`
-}
 
 // SnatchRedEnvelope 抢红包
 func SnatchRedEnvelope(c *gin.Context) {
@@ -39,7 +33,7 @@ func SnatchRedEnvelope(c *gin.Context) {
 	//查看uid是否存在
 	count := 0
 	maxCount := viper.GetInt("snatchMaxCount")
-	if !user.CheckUserExists() {
+	if user.CheckUserExists() {
 		//检查抢红包次数
 		count0, err := user.CheckSnatchCount()
 		if err != nil {
@@ -95,9 +89,93 @@ func SnatchRedEnvelope(c *gin.Context) {
 		})
 		return
 	}
-	data := successMsg{envelopeID, maxCount, count + 1}
+	data := SuccessSnatch{envelopeID, maxCount, count + 1}
 	c.JSON(http.StatusOK, gin.H{
-		"code": 1,
+		"code": 0,
+		"msg":  "success",
+		"data": data,
+	})
+	return
+}
+
+// OpenRedEnvelope 拆红包
+func OpenRedEnvelope(c *gin.Context) {
+	var openre OpenRE
+	//匹配参数
+	if err := c.ShouldBind(&openre); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code": 500,
+			"msg":  "error, 输入参数有误",
+			"data": err,
+		})
+		return
+	}
+	if openre.UID == nil || openre.EnvelopeID == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code": 500,
+			"msg":  "error, 未能获取全部参数",
+			"data": nil,
+		})
+		return
+	}
+	money, err := openre.Open()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code": 100,
+			"msg":  "error, 不存在相应记录或更新数据库失败",
+			"data": nil,
+		})
+		return
+	}
+	data := SuccessOpen{money}
+	c.JSON(http.StatusOK, gin.H{
+		"code": 0,
+		"msg":  "success",
+		"data": data,
+	})
+	return
+}
+
+// GetWalletList 钱包列表
+func GetWalletList(c *gin.Context) {
+	var user User
+	//匹配参数
+	if err := c.ShouldBind(&user); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code": 500,
+			"msg":  "error, 输入参数有误",
+			"data": err,
+		})
+		return
+	}
+	if user.UID == nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code": 500,
+			"msg":  "error, 未获取到uid",
+			"data": nil,
+		})
+		return
+	}
+	if !user.CheckUserExists() {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code": 100,
+			"msg":  "error, 用户不存在",
+			"data": nil,
+		})
+		return
+	}
+	list, err := user.QueryList()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code": 100,
+			"msg":  "error, 数据库查询列表失败",
+			"data": nil,
+		})
+		return
+	}
+	data := &SuccessGet{user.Amount, list}
+	c.JSON(http.StatusOK, gin.H{
+		"code": 0,
 		"msg":  "success",
 		"data": data,
 	})
