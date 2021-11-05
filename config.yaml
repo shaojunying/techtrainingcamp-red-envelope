@@ -19,3 +19,8 @@ totalNum: 100
 totalAmount: 100000
 minAmount: 100
 maxAmount: 3000
+#限制器
+#每秒放入的令牌数量
+limitRate: 10
+#桶容量
+limitCapacity: 10

@@ -38,15 +38,15 @@ echo "表单创建成功"
 
 #插入数据
 #大批量导入数据时需要换成copy
-insert_user_1="insert user(amount, if_get) values(5, false);"
-insert_user_2="insert user(amount, if_get) values(20, true);"
-insert_user_3="insert user(amount, if_get) values(15, false);"
-insert_user_4="insert user(amount, if_get) values(40, true);"
-
-insert_envelope_1="insert red_envelope(uid, opened, value) values(1, true, 5);"
-insert_envelope_2="insert red_envelope(opened, value) values(false, 30);"
-insert_envelope_3="insert red_envelope(uid, opened, value) values(2, true, 20);"
-insert_envelope_4="insert red_envelope(uid, opened, value) values(4, true, 15);"
+#insert_user_1="insert user(amount, if_get) values(5, false);"
+#insert_user_2="insert user(amount, if_get) values(20, true);"
+#insert_user_3="insert user(amount, if_get) values(15, false);"
+#insert_user_4="insert user(amount, if_get) values(40, true);"
+#
+#insert_envelope_1="insert red_envelope(uid, opened, value) values(1, true, 5);"
+#insert_envelope_2="insert red_envelope(opened, value) values(false, 30);"
+#insert_envelope_3="insert red_envelope(uid, opened, value) values(2, true, 20);"
+#insert_envelope_4="insert red_envelope(uid, opened, value) values(4, true, 15);"
 
 #无需导入数据
 #mysql -u${username} -p${password} -D${dbname} -e "${insert_user_1} ${insert_user_2} ${insert_user_3} ${insert_user_4}
