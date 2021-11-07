@@ -71,6 +71,17 @@ func (*mapper) AddRedEnvelopeToUserId(ctx context.Context, userId, redEnvelopeId
 	return err
 }
 
+//CheckIfOwnRedEnvelope 判断用户是否拥有id为redEnvelopeId的红包
+func (*mapper) CheckIfOwnRedEnvelope(ctx context.Context, userId, redEnvelopeId int) (bool, error) {
+    key := fmt.Sprintf("envelopes_${%d}", userId)
+    rdx := database.GetRdx()
+    result, err := rdx.SIsMember(ctx, key, redEnvelopeId).Result()
+    if err != nil {
+        return false, errors.New("failed to check if user own red envelope, err: " + err.Error())
+    }
+    return result, nil
+}
+
 //OpenRedEnvelope 如果id为redEnvelopeId的红包没有被拆开, 则拆开红包, 并返回true；否则返回false
 func (*mapper) OpenRedEnvelope(ctx context.Context, redEnvelopeId int, value int) (bool, error) {
 	key := fmt.Sprintf("opened_${%d}", redEnvelopeId)
