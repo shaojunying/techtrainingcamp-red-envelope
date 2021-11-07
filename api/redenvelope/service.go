@@ -161,3 +161,16 @@ func (u *User) QueryList() ([]*WalletList, error) {
 	tx.Commit()
 	return data, nil
 }
+
+// 生成红包金额
+func GenerateRedEnvelopeValue(remainValue, remainAmount, maxValue, minValue int) int {
+	rand.Seed(time.Now().UnixNano())
+	averageValue := remainValue / remainAmount
+	for i := 0; i < 5; i++ {
+		value := int(float64(averageValue) * rand.ExpFloat64())
+		if value >= minValue && value <= maxValue {
+			return value
+		}
+	}
+	return averageValue
+}
