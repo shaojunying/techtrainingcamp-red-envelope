@@ -15,6 +15,7 @@ func main() {
 	//启动数据库
 	db := database.InitDB()
 	defer db.Close()
+	database.InitRedis()
 
 	r := routers.InitRouter()
 
