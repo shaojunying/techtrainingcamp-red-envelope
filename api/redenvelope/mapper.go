@@ -3,6 +3,7 @@ package redenvelope
 import (
 	"errors"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/go-redis/redis/v8"
 	"golang.org/x/net/context"
 	"red_envelope/database"
@@ -73,18 +74,41 @@ func (*mapper) AddRedEnvelopeToUserId(ctx context.Context, userId, redEnvelopeId
 
 //CheckIfOwnRedEnvelope 判断用户是否拥有id为redEnvelopeId的红包
 func (*mapper) CheckIfOwnRedEnvelope(ctx context.Context, userId, redEnvelopeId int) (bool, error) {
-    key := fmt.Sprintf("envelopes_${%d}", userId)
-    rdx := database.GetRdx()
-    result, err := rdx.SIsMember(ctx, key, redEnvelopeId).Result()
-    if err != nil {
-        return false, errors.New("failed to check if user own red envelope, err: " + err.Error())
-    }
-    return result, nil
+	key := fmt.Sprintf("envelopes_${%d}", userId)
+	rdx := database.GetRdx()
+	result, err := rdx.SIsMember(ctx, key, redEnvelopeId).Result()
+	if err != nil {
+		return false, errors.New("failed to check if user own red envelope, err: " + err.Error())
+	}
+	return result, nil
 }
 
-//OpenRedEnvelope 如果id为redEnvelopeId的红包没有被拆开, 则拆开红包, 并返回true；否则返回false
-func (*mapper) OpenRedEnvelope(ctx context.Context, redEnvelopeId int, value int) (bool, error) {
-	key := fmt.Sprintf("opened_${%d}", redEnvelopeId)
+//RemoveRedEnvelopeForUser 将红包从用户的红包列表中移除
+func (*mapper) RemoveRedEnvelopeForUser(ctx context.Context, userId, redEnvelopeId int) error {
+	key := fmt.Sprintf("envelopes_${%d}", userId)
 	rdx := database.GetRdx()
-	return rdx.SetNX(ctx, key, value, 0).Result()
+	err := rdx.SRem(ctx, key, redEnvelopeId).Err()
+	return err
+}
+
+//DecreaseRedEnvelopes 将id为userId的用户已抢到的红包数目减1, 并返回新的红包数目
+func (m *mapper) DecreaseRedEnvelopes(c *gin.Context, userId int) error {
+	key := fmt.Sprintf("num_${%d}", userId)
+	rdx := database.GetRdx()
+	_, err := rdx.Decr(c, key).Result()
+	if err != nil {
+		return errors.New("failed to decrease red envelopes for user, err: " + err.Error())
+	}
+	return nil
+}
+
+//GenerateNewRedEnvelopeId 生成新的红包id
+func (*mapper) GenerateNewRedEnvelopeId(c *gin.Context) (int, error) {
+	key := "red_envelope_id"
+	rdx := database.GetRdx()
+	result, err := rdx.Incr(c, key).Result()
+	if err != nil {
+		return -1, errors.New("failed to generate new red envelope id, err: " + err.Error())
+	}
+	return int(result), nil
 }
