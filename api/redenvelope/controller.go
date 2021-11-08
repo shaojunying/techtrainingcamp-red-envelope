@@ -1,7 +1,7 @@
 package redenvelope
 
 import (
-	"fmt"
+	//"fmt"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
 	"math/rand"
@@ -69,7 +69,7 @@ func SnatchRedEnvelope(c *gin.Context) {
 	rand.Seed(time.Now().UnixNano())
 	num := rand.Intn(100)                            //随机数
 	probability := viper.GetInt("snatchProbability") //抢到的概率值 %
-	fmt.Println(probability)
+	//fmt.Println(probability)
 	if num >= probability {
 		c.JSON(http.StatusOK, gin.H{
 			"code": 1,
@@ -180,4 +180,12 @@ func GetWalletList(c *gin.Context) {
 		"data": data,
 	})
 	return
+}
+
+// WrkTest 压力测试
+func WrkTest(c *gin.Context) {
+	c.JSON(http.StatusOK, gin.H{
+		"code": 0,
+		"msg":  "success",
+	})
 }

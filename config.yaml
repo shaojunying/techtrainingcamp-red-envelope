@@ -21,6 +21,6 @@ minAmount: 100
 maxAmount: 3000
 #限制器
 #每秒放入的令牌数量
-limitRate: 10
+limitRate: 1000
 #桶容量
-limitCapacity: 10
+limitCapacity: 1000
