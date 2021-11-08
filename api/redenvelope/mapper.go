@@ -101,7 +101,6 @@ func (*mapper) GenerateNewRedEnvelopeId(ctx context.Context) (int, error) {
 func (*mapper) GetConfigParameters(ctx context.Context) (*Config, error) {
 	rdx := database.GetRdx()
 	configMap, err := rdx.HGetAll(ctx, ConfigKey).Result()
-	fmt.Println(configMap)
 	if err != nil {
 		return nil, err
 	}

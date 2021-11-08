@@ -4,10 +4,10 @@ package redenvelope
 var ConfigKey = "config"
 
 // NumberOfRedEnvelopePerUserKey redis中当前用户已抢红包数
-var NumberOfRedEnvelopePerUserKey = "num_${%d}"
+var NumberOfRedEnvelopePerUserKey = "num_%d"
 
 //SetOfRedEnvelopePerUserKey redis中当前用户已抢红包集合
-var SetOfRedEnvelopePerUserKey = "envelopes_${%d}"
+var SetOfRedEnvelopePerUserKey = "envelopes_%d"
 
 //NumberOfEnvelopesForAllUserKey redis中所有用户已抢红包数
 var NumberOfEnvelopesForAllUserKey = "number_of_envelopes"

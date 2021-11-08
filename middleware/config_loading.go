@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 	"red_envelope/api/redenvelope"
 )
@@ -11,6 +12,7 @@ func ConfigLoadingMiddleware() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		config, err := redenvelope.Mapper.GetConfigParameters(c)
+		log.Printf("成功获取参数配置信息%+v\n", config)
 		if err != nil {
             c.JSON(http.StatusInternalServerError, gin.H{
                 "code":    -1,
