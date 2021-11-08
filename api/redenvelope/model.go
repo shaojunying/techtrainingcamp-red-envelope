@@ -44,3 +44,23 @@ type SuccessGet struct {
 	Amount       int           `json:"amount"`
 	EnvelopeList []*WalletList `json:"envelope_list"`
 }
+
+type Config struct {
+	//MaxCount 每个用户最多可抢到的次数
+	MaxCount	int        `json:"max_count"`
+
+	// Probability 每次抢到红包的概率
+	Probability float64 		`json:"probability"`
+
+	// BudgetField 总预算（以分为单位）
+	Budget 		int 		`json:"budget"`
+
+	// TotalNumber 总红包数量
+	TotalNumber int 		`json:"total_number"`
+
+	// MinValue 每个红包的最小金额（以分为单位）
+	MinValue int 		`json:"min_value"`
+
+	// MaxValue 每个红包的最大金额（以分为单位）
+	MaxValue int         `json:"max_value"`
+}

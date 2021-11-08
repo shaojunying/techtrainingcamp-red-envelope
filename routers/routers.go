@@ -14,6 +14,7 @@ func InitRouter() *gin.Engine {
 	limitRate := int64(viper.GetInt("limitRate"))
 	limitCapacity := int64(viper.GetInt("limitCapacity"))
 	router.Use(middleware.RateLimitMiddleware(time.Second, limitRate, limitCapacity))
+	router.Use(middleware.ConfigLoadingMiddleware())
 	setUpRouter(router)
 	return router
 }
