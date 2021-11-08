@@ -1,6 +1,7 @@
 package routers
 
 import (
+	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"red_envelope/api/redenvelope"
 )
@@ -18,6 +19,7 @@ func InitRouter() *gin.Engine {
 
 // 设置路由
 func setUpRouter(router *gin.Engine) {
+	pprof.Register(router) // 注册pprof路由
 	api := router.Group("/")
 	redenvelope.RegisterRedEnvelopeRouter(api.Group("/redenvelope"))
 }
