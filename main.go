@@ -2,12 +2,18 @@ package main
 
 import (
 	"github.com/spf13/viper"
+	"log"
+	"net/http"
+	_ "net/http/pprof"
 	"red_envelope/config"
 	"red_envelope/database"
 	"red_envelope/routers"
 )
 
 func main() {
+	go func() {
+		log.Println(http.ListenAndServe("localhost:6060", nil))
+	}()
 
 	//读取配置
 	config.InitConf()
