@@ -35,7 +35,7 @@ function request()
         body = string.format(body, uid)
         path = "/redenvelope/snatch"
     end
-    print(body, path)
+    ---print(body, path)
     return wrk.format(nil, path, nil, body)
 end
 
