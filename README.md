@@ -31,3 +31,12 @@
 
     `-t`后面接线程数  `-c`后面接连接数，连接数需要根据情况调测
 
+## 测试
+
+- **性能测试**
+
+  - main.go中在测试环境添加"github.com/gin-contrib/pprof"包用于性能分析，生产环境中删去该包
+
+  - 使用方式：运行过程中，可以在 "http://localhost:8080/debug/pprof/" 中查看程序性能；
+              压测场景下，可以先运行 "go tool pprof -http=:1234 http://localhost:8080/debug/pprof/profile?second=10" 再马上运行压力测试脚本，之后可以在 "http://localhost:1234" 中查看图形化堆栈调用（Graph）和火焰图（Flame Graph）等。
+
