@@ -109,31 +109,31 @@ func (*mapper) GetConfigParameters(ctx context.Context) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
-	config.MaxCount = maxCount
+	config.MaxCount = &maxCount
 	probability, err := strconv.ParseFloat(configMap[ProbabilityField], 64)
 	if err != nil {
         return nil, err
     }
-	config.Probability = probability
+	config.Probability = &probability
 	budget, err := strconv.Atoi(configMap[BudgetField])
 	if err != nil {
 		return nil, err
 	}
-	config.Budget = budget
+	config.Budget = &budget
 	totalNumber , err := strconv.Atoi(configMap[TotalNumberField])
 	if err != nil {
         return nil, err
     }
-	config.TotalNumber = totalNumber
+	config.TotalNumber = &totalNumber
 	minValue, err := strconv.Atoi(configMap[MinValueField])
 	if err != nil {
         return nil, err
     }
-	config.MinValue = minValue
+	config.MinValue = &minValue
 	maxValue, err := strconv.Atoi(configMap[MaxValueField])
 	if err != nil {
         return nil, err
     }
-	config.MaxValue = maxValue
+	config.MaxValue = &maxValue
 	return &config, nil
 }
