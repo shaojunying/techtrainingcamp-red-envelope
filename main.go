@@ -1,13 +1,14 @@
 package main
 
 import (
-	"github.com/spf13/viper"
 	"log"
 	"net/http"
 	_ "net/http/pprof"
 	"red_envelope/config"
 	"red_envelope/database"
 	"red_envelope/routers"
+
+	"github.com/spf13/viper"
 )
 
 func main() {
@@ -22,6 +23,13 @@ func main() {
 	db := database.InitDB()
 	defer db.Close()
 	database.InitRedis()
+
+	err := database.InitMQ()
+	if err != nil {
+		log.Println("Mq init error.")
+		return
+	}
+	defer database.CloseMQ()
 
 	r := routers.InitRouter()
 

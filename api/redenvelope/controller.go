@@ -1,9 +1,10 @@
 package redenvelope
 
 import (
-	"github.com/gin-gonic/gin"
 	"log"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
 // SnatchRedEnvelope 抢红包
@@ -118,6 +119,11 @@ func SnatchRedEnvelope(c *gin.Context) {
 	log.Printf("成功为用户 %d 添加红包 %d\n", *user.UID, envelopeID)
 
 	// TODO 将红包、用户信息写入MQ
+	err = SnatchHistoryToMQ(*user.UID, envelopeID)
+	if err != nil {
+		//TODO 回滚操作，丢弃请求。
+		log.Println("MQ not working... Rollback & Return")
+	}
 
 	data := SuccessSnatch{envelopeID, maxCount, curCount}
 	c.JSON(http.StatusOK, gin.H{
@@ -125,7 +131,6 @@ func SnatchRedEnvelope(c *gin.Context) {
 		"msg":  "success",
 		"data": data,
 	})
-	return
 }
 
 // OpenRedEnvelope 拆红包
@@ -189,7 +194,6 @@ func OpenRedEnvelope(c *gin.Context) {
 		"msg":  "success",
 		"data": data,
 	})
-	return
 }
 
 // GetWalletList 钱包列表
@@ -235,5 +239,4 @@ func GetWalletList(c *gin.Context) {
 		"msg":  "success",
 		"data": data,
 	})
-	return
 }

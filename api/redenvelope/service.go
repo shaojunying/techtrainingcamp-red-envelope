@@ -1,12 +1,17 @@
 package redenvelope
 
 import (
+	"context"
 	"errors"
-	"github.com/jinzhu/gorm"
-	"github.com/spf13/viper"
+	"fmt"
+	"log"
 	"math/rand"
 	"red_envelope/database"
 	"time"
+
+	"github.com/apache/rocketmq-client-go/v2/primitive"
+	"github.com/jinzhu/gorm"
+	"github.com/spf13/viper"
 )
 
 // CheckUserExists 查看用户id是否存在
@@ -173,4 +178,16 @@ func GenerateRedEnvelopeValue(remainValue, remainAmount, maxValue, minValue int)
 		}
 	}
 	return averageValue
+}
+
+func SnatchHistoryToMQ(uid int, pid int) error {
+	data_to_be_sent := fmt.Sprintf("{%d,%d}", uid, pid)
+	mq := database.GetMQ()
+	result, err := mq.SendSync(context.Background(), primitive.NewMessage("snatch_history", []byte(data_to_be_sent)))
+	if err != nil {
+		return errors.New("MQ produce error: " + err.Error())
+	} else {
+		log.Println("MQ produce success: " + result.String())
+	}
+	return nil
 }
