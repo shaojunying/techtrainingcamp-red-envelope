@@ -12,6 +12,15 @@ var SetOfRedEnvelopePerUserKey = "envelopes_%d"
 //NumberOfEnvelopesForAllUserKey redis中所有用户已抢红包数
 var NumberOfEnvelopesForAllUserKey = "number_of_envelopes"
 
+//CurEnvelopeIdKey 目前已生成的最大红包id
+var CurEnvelopeIdKey = "cur_envelope_id"
+
+//OpenedEnvelopesKey 目前已拆开的红包数目
+var OpenedEnvelopesKey = "opened_envelopes"
+
+//SpentBudgetKey 目前已花费的预算
+var SpentBudgetKey = "spent_budget"
+
 //MaxCountField 每个用户最多可抢到的次数
 var MaxCountField = "max_count"
 
