@@ -3,10 +3,11 @@ package redenvelope
 import (
 	"errors"
 	"fmt"
-	"github.com/go-redis/redis/v8"
-	"golang.org/x/net/context"
 	"red_envelope/database"
 	"strconv"
+
+	"github.com/go-redis/redis/v8"
+	"golang.org/x/net/context"
 )
 
 var Mapper = newMapper()
@@ -112,28 +113,35 @@ func (*mapper) GetConfigParameters(ctx context.Context) (*Config, error) {
 	config.MaxCount = &maxCount
 	probability, err := strconv.ParseFloat(configMap[ProbabilityField], 64)
 	if err != nil {
-        return nil, err
-    }
+		return nil, err
+	}
 	config.Probability = &probability
 	budget, err := strconv.Atoi(configMap[BudgetField])
 	if err != nil {
 		return nil, err
 	}
 	config.Budget = &budget
-	totalNumber , err := strconv.Atoi(configMap[TotalNumberField])
+	totalNumber, err := strconv.Atoi(configMap[TotalNumberField])
 	if err != nil {
-        return nil, err
-    }
+		return nil, err
+	}
 	config.TotalNumber = &totalNumber
 	minValue, err := strconv.Atoi(configMap[MinValueField])
 	if err != nil {
-        return nil, err
-    }
+		return nil, err
+	}
 	config.MinValue = &minValue
 	maxValue, err := strconv.Atoi(configMap[MaxValueField])
 	if err != nil {
-        return nil, err
-    }
+		return nil, err
+	}
 	config.MaxValue = &maxValue
 	return &config, nil
+}
+
+// SetConfigParameters 设置配置参数
+func (*mapper) SetConfigParameters(ctx context.Context, configMap map[string]interface{}) error {
+	rdx := database.GetRdx()
+	err := rdx.HSet(ctx, ConfigKey, configMap).Err()
+	return err
 }

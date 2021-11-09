@@ -245,3 +245,51 @@ func GetWalletList(c *gin.Context) {
 		"data": data,
 	})
 }
+
+// SetConfig 设置红包全局配置
+func SetRedEnvelopeConfig(c *gin.Context) {
+	var config Config
+	//匹配参数
+	if err := c.ShouldBind(&config); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code": 500,
+			"msg":  "error, 输入参数有误",
+			"data": err,
+		})
+		return
+	}
+	var configMap map[string]interface{}
+	if config.MaxCount != nil {
+		c.Set(MaxCountField, *config.MaxCount)
+		configMap[MaxCountField] = *config.MaxCount
+	}
+	if config.Probability != nil {
+		c.Set(ProbabilityField, *config.Probability)
+		configMap[ProbabilityField] = *config.Probability
+	}
+	if config.Budget != nil {
+		c.Set(BudgetField, *config.Budget)
+		configMap[BudgetField] = *config.Budget
+	}
+	if config.TotalNumber != nil {
+		c.Set(TotalNumberField, *config.TotalNumber)
+		configMap[TotalNumberField] = *config.TotalNumber
+	}
+	if config.MinValue != nil {
+		c.Set(MinValueField, *config.MinValue)
+		configMap[MinValueField] = *config.MinValue
+	}
+	if config.MaxValue != nil {
+		c.Set(MaxValueField, *config.MaxValue)
+		configMap[MaxValueField] = *config.MaxValue
+	}
+	err := Mapper.SetConfigParameters(c, configMap)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    -1,
+			"message": "设置红包全局配置失败",
+		})
+		return
+	}
+}
