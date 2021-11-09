@@ -187,6 +187,11 @@ func OpenRedEnvelope(c *gin.Context) {
 	money := -1
 
 	// TODO 将红包id、红包金额写入MQ
+	err = OpenValueToMQ(*openre.UID, money)
+	if err != nil {
+		//TODO 回滚操作，丢弃请求。
+		log.Println("MQ not working... Rollback & Return")
+	}
 
 	data := SuccessOpen{money}
 	c.JSON(http.StatusOK, gin.H{

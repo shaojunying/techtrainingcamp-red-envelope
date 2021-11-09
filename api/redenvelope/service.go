@@ -191,3 +191,15 @@ func SnatchHistoryToMQ(uid int, pid int) error {
 	}
 	return nil
 }
+
+func OpenValueToMQ(pid int, value int) error {
+	data_to_be_sent := fmt.Sprintf("[%d,%d]", pid, value)
+	mq := database.GetMQ()
+	result, err := mq.SendSync(context.Background(), primitive.NewMessage("open_value", []byte(data_to_be_sent)))
+	if err != nil {
+		return errors.New("MQ produce error: " + err.Error())
+	} else {
+		log.Println("MQ produce success: " + result.String())
+	}
+	return nil
+}
