@@ -32,7 +32,6 @@ func main() {
 	defer database.CloseMQ()
 
 	r := routers.InitRouter()
-	pprof.Register(r)
 
 	port := viper.GetString("server.port")
 	r.Run(":" + port)

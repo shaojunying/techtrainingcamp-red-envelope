@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"github.com/gin-gonic/gin"
 	"github.com/magiconair/properties/assert"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -24,7 +23,7 @@ func MockJsonPost(c *gin.Context /* the test context */, jsonMap interface{}) {
 	if err != nil {
 		panic(err)
 	}
-	c.Request.Body = io.NopCloser(bytes.NewBuffer(jsonBytes))
+	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(jsonBytes))
 }
 
 func TestSnatchRedEnvelope(t *testing.T) {
