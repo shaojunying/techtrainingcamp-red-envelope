@@ -3,8 +3,8 @@ package redenvelope
 import (
 	//"fmt"
 	"github.com/gin-gonic/gin"
-	//"math/rand"
 	"log"
+	"math/rand"
 	"net/http"
 )
 
@@ -77,6 +77,21 @@ func SnatchRedEnvelope(c *gin.Context) {
 			"msg":  "error, 系统已发红包总数达到限额",
 			"data": nil,
 		})
+		return
+	}
+
+	// 用户有一定概率抢不到红包
+	probability := c.GetFloat64(ProbabilityField)
+	// 生成一个0到1的随机数
+	random := rand.Float64()
+	if random > probability {
+		// 没抢到红包
+		log.Printf("用户 %d 没抢到红包\n", *user.UID)
+		c.JSON(http.StatusOK, gin.H{
+            "code": 500,
+            "msg":  "error, 用户没抢到红包",
+            "data": nil,
+        })
 		return
 	}
 
