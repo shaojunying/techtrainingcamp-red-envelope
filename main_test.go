@@ -29,7 +29,7 @@ func MockJsonPost(c *gin.Context /* the test context */, jsonMap interface{}) {
 	c.Request.Body = ioutil.NopCloser(bytes.NewBuffer(jsonBytes))
 }
 
-func HandleERR(t *testing.T, err error){
+func HandleERR(t *testing.T, err error) {
 	if err == nil {
 		return
 	}
@@ -101,6 +101,19 @@ func TestOpenRedEnvelope(t *testing.T) {
 
 	redenvelope.OpenRedEnvelope(ctx)
 	assert.Equal(t, w.Code, http.StatusOK)
+	body, err := ioutil.ReadAll(w.Body)
+	if err != nil {
+		t.Log(err)
+	}
+	var data map[string]interface{}
+	if err = json.Unmarshal(body, &data); err != nil {
+		t.Log(err)
+	}
+	code := int(data["code"].(float64))
+	if !(reflect.DeepEqual(0, code)) {
+		t.Log("err, not expected code, the code is", code)
+		t.FailNow()
+	}
 }
 
 func TestGetWalletList(t *testing.T) {
@@ -133,6 +146,6 @@ func TestGetWalletList(t *testing.T) {
 	assert.Equal(t, w.Code, http.StatusOK)
 }
 
-func TestWorkflow(t *testing.T){
+func TestWorkflow(t *testing.T) {
 
 }
