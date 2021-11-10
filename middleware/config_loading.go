@@ -23,8 +23,6 @@ func LoadConfig(c *gin.Context) {
 	c.Set(redenvelope.TotalNumberField, *config.TotalNumber)
 	c.Set(redenvelope.MaxValueField, *config.MaxValue)
 	c.Set(redenvelope.MinValueField, *config.MinValue)
-
-	c.Next()
 }
 
 //ConfigLoadingMiddleware 获取配置参数信息
@@ -32,5 +30,6 @@ func ConfigLoadingMiddleware() gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		LoadConfig(c)
+		c.Next()
 	}
 }
