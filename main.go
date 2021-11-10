@@ -3,13 +3,13 @@ package main
 import (
 	"log"
 	"net/http"
-	_ "net/http/pprof"
 	"red_envelope/config"
 	"red_envelope/database"
 	"red_envelope/routers"
 
 	"github.com/spf13/viper"
 )
+
 
 func main() {
 	go func() {
