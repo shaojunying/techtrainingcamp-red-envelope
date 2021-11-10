@@ -1,125 +1,160 @@
 package redenvelope
 
 import (
-	//"fmt"
-	"github.com/gin-gonic/gin"
+	"errors"
 	"log"
 	"math/rand"
 	"net/http"
+	"time"
+
+	"github.com/gin-gonic/gin"
 )
+
+func HandleSnatchOK(c *gin.Context, code int, uid int, data *SuccessSnatch) {
+	var msg string
+	switch code {
+	case 0:
+		msg = "uid正确，成功抢到红包"
+	case 1:
+		msg = "uid正确，没能抢到红包"
+	case 2:
+		msg = "uid正确，用户抢红包次数到限额"
+	case 3:
+		msg = "红包已全部发完"
+	}
+	log.Printf("%v的用户正常响应：%v\n", uid, msg)
+	if data == nil {
+		c.JSON(http.StatusOK, gin.H{
+			"code": code,
+			"msg":  msg,
+			"data": nil,
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code": code,
+		"msg":  msg,
+		"data": *data,
+	})
+}
+
+func HandleOpenOK(c *gin.Context, code int, uid int, envelopeid int, data *SuccessOpen) {
+	var msg string
+	switch code {
+	case 0:
+		msg = "成功拆开红包"
+	case 4:
+		msg = "不能拆未拥有的或者已拆开的红包"
+	case 2:
+		msg = "uid正确，用户抢红包次数到限额"
+	case 3:
+		msg = "红包已全部发完"
+	}
+	log.Printf("%v的用户拆%v的红包正常响应：%v\n", uid, envelopeid, msg)
+	if data == nil {
+		c.JSON(http.StatusOK, gin.H{
+			"code": code,
+			"msg":  msg,
+			"data": nil,
+		})
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code": code,
+		"msg":  msg,
+		"data": *data,
+	})
+}
+
+func HandleERR(c *gin.Context, code int, err error) {
+	var msg string
+	switch code {
+	case 101, 102:
+		msg = "请求参数有误"
+	case 201, 202:
+		msg = "查询时有误"
+	case 301, 302, 303:
+		msg = "写入时有误"
+	case 401, 402:
+		msg = "其他错误"
+	}
+	log.Printf("%v，错误码：%v，具体错误为：%v\n", msg, code, err)
+	c.JSON(http.StatusInternalServerError, gin.H{
+		"code": code,
+		"msg":  msg,
+		"data": nil,
+	})
+}
 
 // SnatchRedEnvelope 抢红包
 func SnatchRedEnvelope(c *gin.Context) {
 	var user User
 	//匹配参数
-	if err := c.ShouldBind(&user); err != nil {
-		log.Printf("输入参数有误:%v\n", err)
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code": 500,
-			"msg":  "error, 输入参数有误",
-			"data": err,
-		})
+	err := c.ShouldBind(&user)
+	if err != nil {
+		HandleERR(c, 101, err)
 		return
 	}
+
 	if user.UID == nil {
-		log.Printf("未获取到uid\n")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code": 500,
-			"msg":  "error, 未获取到uid",
-			"data": nil,
-		})
+		HandleERR(c, 102, errors.New("user.UID is nil"))
 		return
 	}
 	log.Printf("用户 %d 开始抢红包\n", *user.UID)
+
+	// 只有一定概率抢到红包
+	rand.Seed(time.Now().UnixNano())
+	num := rand.Float64()                         //随机数
+	probability := c.GetFloat64(ProbabilityField) //抢到的概率值 %
+	log.Printf("用户 %d 抽到了随机数 %f，小于 %f 可以抢到红包", *user.UID, num, probability)
+	if num > probability {
+		HandleSnatchOK(c, 1, *user.UID, nil)
+		return
+	}
 
 	maxCount := c.GetInt(MaxCountField)
 	log.Printf("成功获取最大的可抢红包限额: %d\n", maxCount)
 	// 获取当前用户已抢红包的数量
 	curCount, err := Mapper.GetRedEnvelops(c, *user.UID)
 	if err != nil {
-		log.Printf("查询用户 %d 已抢红包数失败\n", *user.UID)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": 500,
-			"msg":  "error, 查询用户已抢红包数失败",
-			"data": err,
-		})
+		HandleERR(c, 201, err)
 		return
 	}
 	log.Printf("成功获取用户 %d 已抢红包数目: %d\n", *user.UID, curCount)
 	// 判断用户是否超过红包数限额
 	if curCount >= maxCount {
-		log.Printf("用户 %d 已抢红包数达到限额\n", *user.UID)
-		c.JSON(http.StatusOK, gin.H{
-			"code": 500,
-			"msg":  "error, 用户已抢红包数达到限额",
-			"data": nil,
-		})
+		HandleSnatchOK(c, 2, *user.UID, nil)
 		return
 	}
 
 	// 获取系统已发红包总数
 	numberOfEnvelopesForALlUser, err := Mapper.GetNumberOfEnvelopesForALlUser(c)
 	if err != nil {
-		log.Printf("查询系统已发红包总数失败\n")
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": 500,
-			"msg":  "error, 查询用户已发红包总数失败",
-			"data": err,
-		})
+		HandleERR(c, 202, err)
 		return
 	}
 	log.Printf("成功获取系统已发红包总数: %d\n", numberOfEnvelopesForALlUser)
 	// 判断系统是否超过红包数限额
 	if numberOfEnvelopesForALlUser >= c.GetInt(TotalNumberField) {
-		log.Printf("系统已发红包总数达到限额\n")
-		c.JSON(http.StatusOK, gin.H{
-			"code": 500,
-			"msg":  "error, 系统已发红包总数达到限额",
-			"data": nil,
-		})
-		return
-	}
-
-	// 用户有一定概率抢不到红包
-	probability := c.GetFloat64(ProbabilityField)
-	// 生成一个0到1的随机数
-	random := rand.Float64()
-	if random > probability {
-		// 没抢到红包
-		log.Printf("用户 %d 没抢到红包\n", *user.UID)
-		c.JSON(http.StatusOK, gin.H{
-            "code": 500,
-            "msg":  "error, 用户没抢到红包",
-            "data": nil,
-        })
+		HandleSnatchOK(c, 3, *user.UID, nil)
 		return
 	}
 
 	// 尝试增加已发红包数
 	numberOfEnvelopesForAllUser, err := Mapper.IncreaseNumberOfEnvelopesForAllUser(c)
 	if err != nil {
-		log.Printf("增加系统已发红包总数失败\n")
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": 500,
-			"msg":  "error, 增加系统已发红包总数失败",
-			"data": err,
-		})
+		HandleERR(c, 301, err)
 		return
 	}
 	log.Printf("成功增加系统已发红包总数: %d\n", numberOfEnvelopesForAllUser)
 	// 判断增加之后是否超额
 	if numberOfEnvelopesForAllUser >= c.GetInt(TotalNumberField) {
-		log.Printf("系统已发红包总数达到限额\n")
 		// 递减刚刚增加的红包
 		err := Mapper.DecreaseOpenedEnvelopes(c)
 		if err != nil {
 			log.Printf("撤销对系统已发红包总数的自增失败")
 		}
-		c.JSON(http.StatusOK, gin.H{
-			"code": 500,
-			"msg":  "error, 系统已发红包总数达到限额",
-			"data": nil,
-		})
+		HandleSnatchOK(c, 3, *user.UID, nil)
 		return
 	}
 
@@ -127,12 +162,7 @@ func SnatchRedEnvelope(c *gin.Context) {
 	log.Printf("尝试增加用户 %d 已抢红包个数\n", *user.UID)
 	curCount, err = Mapper.IncreaseRedEnvelopes(c, *user.UID)
 	if err != nil {
-		log.Printf("增加用户 %d 已抢红包个数失败\n", *user.UID)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": 500,
-			"msg":  "error, 增加已抢红包数失败",
-			"data": err,
-		})
+		HandleERR(c, 302, err)
 		return
 	}
 
@@ -148,11 +178,7 @@ func SnatchRedEnvelope(c *gin.Context) {
 			log.Printf("撤销 增加已抢红包总数失败\n")
 		}
 		log.Printf("取消用户 %d 已抢红包数成功\n", *user.UID)
-		c.JSON(http.StatusOK, gin.H{
-			"code": 500,
-			"msg":  "error, 用户已抢红包数超过限额",
-			"data": nil,
-		})
+		HandleSnatchOK(c, 2, *user.UID, nil)
 		return
 	}
 
@@ -162,23 +188,13 @@ func SnatchRedEnvelope(c *gin.Context) {
 	// 生成新红包的id
 	envelopeID, err := Mapper.IncreaseCurEnvelopeId(c)
 	if err != nil {
-		log.Printf("生成新红包id失败\n")
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": 500,
-			"msg":  "error, 生成新红包id失败",
-			"data": err,
-		})
+		HandleERR(c, 401, err)
 		return
 	}
 	log.Printf("成功为用户 %d 生成红包 %d\n", *user.UID, envelopeID)
 	err = Mapper.AddRedEnvelopeToUserId(c, *user.UID, envelopeID)
 	if err != nil {
-		log.Printf("为用户 %d 添加红包 %d 失败\n", *user.UID, envelopeID)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": 500,
-			"msg":  "error, 添加用户红包id失败",
-			"data": err,
-		})
+		HandleERR(c, 303, err)
 		return
 	}
 	log.Printf("成功为用户 %d 添加红包 %d\n", *user.UID, envelopeID)
@@ -186,6 +202,7 @@ func SnatchRedEnvelope(c *gin.Context) {
 	// 将红包、用户信息写入MQ
 	err = SnatchHistoryToMQ(*user.UID, envelopeID)
 	if err != nil {
+		HandleERR(c, 402, err)
 		// 回滚操作，丢弃请求。
 		log.Println("MQ not working... Rollback & Return")
 		// 撤销上面的redis操作
@@ -201,20 +218,11 @@ func SnatchRedEnvelope(c *gin.Context) {
 		if err != nil {
 			log.Printf("减少已发放的红包总数失败\n")
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": 500,
-			"msg":  "error, 向消息队列发送消息失败",
-			"data": err,
-		})
 		return
 	}
 
 	data := SuccessSnatch{envelopeID, maxCount, curCount}
-	c.JSON(http.StatusOK, gin.H{
-		"code": 0,
-		"msg":  "success",
-		"data": data,
-	})
+	HandleSnatchOK(c, 0, *user.UID, &data)
 }
 
 // OpenRedEnvelope 拆红包
@@ -222,101 +230,59 @@ func OpenRedEnvelope(c *gin.Context) {
 	var openre OpenRE
 	//匹配参数
 	if err := c.ShouldBind(&openre); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": 500,
-			"msg":  "error, 输入参数有误",
-			"data": err,
-		})
+		HandleERR(c, 101, err)
 		return
 	}
 	if openre.UID == nil || openre.EnvelopeID == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": 500,
-			"msg":  "error, 未能获取全部参数",
-			"data": nil,
-		})
+		HandleERR(c, 102, errors.New("UID or EnvelopeID is nil"))
 		return
 	}
 	// 判断userId和envelopeId是否匹配
 	owned, err := Mapper.CheckIfOwnRedEnvelope(c, *openre.UID, *openre.EnvelopeID)
 	if err != nil {
-		log.Printf("查询用户 %d 是否拥有红包 %d 失败\n", *openre.UID, *openre.EnvelopeID)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": 500,
-			"msg":  "error, 查询用户是否拥有红包失败",
-			"data": err,
-		})
+		HandleERR(c, 203, err)
 		return
 	}
 	if !owned {
-		log.Printf("用户 %d 没有拥有红包 %d\n", *openre.UID, *openre.EnvelopeID)
-		c.JSON(http.StatusOK, gin.H{
-			"code": 500,
-			"msg":  "error, 用户未拥有该红包或该红包已被拆开",
-			"data": nil,
-		})
+		HandleOpenOK(c, 4, *openre.UID, *openre.EnvelopeID, nil)
 		return
 	}
 
 	// 用户拥有该红包，尝试拆红包
 	err = Mapper.RemoveRedEnvelopeForUser(c, *openre.UID, *openre.EnvelopeID)
 	if err != nil {
-		log.Printf("为用户 %d 拆红包 %d 失败\n", *openre.UID, *openre.EnvelopeID)
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": 500,
-			"msg":  "error, 拆红包失败",
-			"data": err,
-		})
+		HandleERR(c, 304, err)
 		return
 	}
 
 	// 生成红包的金额
 	openedEnvelopes, err := Mapper.GetOpenedEnvelopes(c)
 	if err != nil {
-		log.Printf("获取已拆开红包个数失败\n")
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": 500,
-			"msg":  "error, 获取已拆开红包个数失败",
-			"data": err,
-		})
+		HandleERR(c, 204, err)
 		return
 	}
 	spentBudget, err := Mapper.GetSpentBudget(c)
 	if err != nil {
-		log.Printf("获取已花费预算失败\n")
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": 500,
-			"msg":  "error, 获取已花费预算失败",
-			"data": err,
-		})
+		HandleERR(c, 205, err)
 		return
 	}
 	money := GenerateRedEnvelopeValue(c.GetInt(BudgetField)-spentBudget,
 		c.GetInt(TotalNumberField)-openedEnvelopes, c.GetInt(MaxValueField), c.GetInt(MinValueField))
 	_, err = Mapper.IncreaseSpentBudget(c, money)
 	if err != nil {
-		log.Printf("增加已花费预算失败\n")
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": 500,
-			"msg":  "error, 增加已花费预算失败",
-			"data": err,
-		})
+		HandleERR(c, 305, err)
 		return
 	}
 	_, err = Mapper.IncreaseOpenedEnvelopes(c)
 	if err != nil {
-		log.Printf("增加已拆红包数失败\n")
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": 500,
-			"msg":  "error, 增加已拆红包数失败",
-			"data": err,
-		})
+		HandleERR(c, 306, err)
 		return
 	}
 
 	// 将红包id、红包金额写入MQ
 	err = OpenValueToMQ(*openre.UID, money)
 	if err != nil {
+		HandleERR(c, 402, err)
 		// 回滚操作，丢弃请求。
 		log.Println("MQ not working... Rollback & Return")
 		// 撤销上面的redis操作
@@ -332,20 +298,10 @@ func OpenRedEnvelope(c *gin.Context) {
 		if err != nil {
 			log.Printf("将红包 %d 放入用户 %d 的红包集合失败\n", *openre.EnvelopeID, *openre.UID)
 		}
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": 500,
-			"msg":  "error, 向消息队列发送消息失败",
-			"data": err,
-		})
 		return
 	}
 
-	data := SuccessOpen{money}
-	c.JSON(http.StatusOK, gin.H{
-		"code": 0,
-		"msg":  "success",
-		"data": data,
-	})
+	HandleOpenOK(c, 0, *openre.UID, *openre.EnvelopeID, &SuccessOpen{money})
 }
 
 // GetWalletList 钱包列表
@@ -353,22 +309,15 @@ func GetWalletList(c *gin.Context) {
 	var user User
 	//匹配参数
 	if err := c.ShouldBind(&user); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": 500,
-			"msg":  "error, 输入参数有误",
-			"data": err,
-		})
+		HandleERR(c, 101, err)
 		return
 	}
 	if user.UID == nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": 500,
-			"msg":  "error, 未获取到uid",
-			"data": nil,
-		})
+		HandleERR(c, 102, errors.New("user.UID is nil"))
 		return
 	}
 	if !user.CheckUserExists() {
+		//HandleERR(c, 这里还不知道怎么写, errors.New("user.UID is nil"))
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code": 100,
 			"msg":  "error, 用户不存在",
@@ -377,12 +326,12 @@ func GetWalletList(c *gin.Context) {
 		return
 	}
 	list, err := user.QueryList()
+	log.Printf("%d获取到的红包列表有：\n", user.UID)
+	for _, pWalletList := range list {
+		log.Printf("%+v\n", *pWalletList)
+	}
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code": 100,
-			"msg":  "error, 数据库查询列表失败",
-			"data": nil,
-		})
+		HandleERR(c, 206, err)
 		return
 	}
 	data := &SuccessGet{user.Amount, list}
