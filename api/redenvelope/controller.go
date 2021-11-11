@@ -45,10 +45,6 @@ func HandleOpenOK(c *gin.Context, code int, uid int, envelopeid int, data *Succe
 		msg = "成功拆开红包"
 	case 4:
 		msg = "不能拆未拥有的或者已拆开的红包"
-	case 2:
-		msg = "uid正确，用户抢红包次数到限额"
-	case 3:
-		msg = "红包已全部发完"
 	}
 	log.Printf("%v的用户拆%v的红包正常响应：%v\n", uid, envelopeid, msg)
 	if data == nil {
@@ -68,9 +64,11 @@ func HandleOpenOK(c *gin.Context, code int, uid int, envelopeid int, data *Succe
 
 func HandleERR(c *gin.Context, code int, err error) {
 	var msg string
+	httpcode := http.StatusInternalServerError
 	switch code {
 	case 101, 102:
 		msg = "请求参数有误"
+		httpcode = http.StatusBadRequest
 	case 201, 202:
 		msg = "查询时有误"
 	case 301, 302, 303:
@@ -79,7 +77,7 @@ func HandleERR(c *gin.Context, code int, err error) {
 		msg = "其他错误"
 	}
 	log.Printf("%v，错误码：%v，具体错误为：%v\n", msg, code, err)
-	c.JSON(http.StatusInternalServerError, gin.H{
+	c.JSON(httpcode, gin.H{
 		"code": code,
 		"msg":  msg,
 		"data": nil,
@@ -316,20 +314,11 @@ func GetWalletList(c *gin.Context) {
 		HandleERR(c, 102, errors.New("user.UID is nil"))
 		return
 	}
-	//if !r.CheckUserExists() {
-	//	//HandleERR(c, 这里还不知道怎么写, errors.New("user.UID is nil"))
-	//	c.JSON(http.StatusInternalServerError, gin.H{
-	//		"code": 100,
-	//		"msg":  "error, 用户不存在",
-	//		"data": nil,
-	//	})
-	//	return
-	//}
 	list, err := r.QueryListSql()
-	//log.Printf("%d获取到的红包列表有：\n", user.UID)
-	//for _, pWalletList := range list {
-	//	log.Printf("%+v\n", *pWalletList)
-	//}
+	log.Printf("%d获取到的红包列表有：\n", r.UID)
+	for _, pWalletList := range list["envelope_list"].([]*WalletList) {
+		log.Printf("%+v\n", *pWalletList)
+	}
 	if err != nil {
 		HandleERR(c, 206, err)
 		return

@@ -38,7 +38,7 @@ func HandleERR(t *testing.T, err error) {
 	t.FailNow()
 }
 
-func Snatch(t *testing.T, w *httptest.ResponseRecorder, ctx *gin.Context, uid int) (int, redenvelope.SuccessSnatch) {
+func Snatch(t *testing.T, w *httptest.ResponseRecorder, ctx *gin.Context, uid int) (int, map[string]interface{}) {
 	MockJsonPost(ctx, map[string]interface{}{"uid": uid})
 	redenvelope.SnatchRedEnvelope(ctx)
 	assert.Equal(t, w.Code, http.StatusOK)
@@ -49,14 +49,14 @@ func Snatch(t *testing.T, w *httptest.ResponseRecorder, ctx *gin.Context, uid in
 	HandleERR(t, err)
 	code := int(datamap["code"].(float64))
 	if datamap["data"] == nil {
-		return code, redenvelope.SuccessSnatch{}
+		return code, nil
 	}
-	data := datamap["data"].(redenvelope.SuccessSnatch)
+	data := datamap["data"].(map[string]interface{})
 	log.Printf("%d抢红包：%+v, data为%+v", uid, code, data)
 	return code, data
 }
 
-func Open(t *testing.T, w *httptest.ResponseRecorder, ctx *gin.Context, uid int, envelope_id int) (int, redenvelope.SuccessOpen) {
+func Open(t *testing.T, w *httptest.ResponseRecorder, ctx *gin.Context, uid int, envelope_id int) (int, map[string]interface{}) {
 	MockJsonPost(ctx, map[string]interface{}{"uid": uid, "envelope_id": envelope_id})
 	redenvelope.OpenRedEnvelope(ctx)
 	assert.Equal(t, w.Code, http.StatusOK)
@@ -67,9 +67,9 @@ func Open(t *testing.T, w *httptest.ResponseRecorder, ctx *gin.Context, uid int,
 	HandleERR(t, err)
 	code := int(datamap["code"].(float64))
 	if datamap["data"] == nil {
-		return code, redenvelope.SuccessOpen{}
+		return code, nil
 	}
-	data := datamap["data"].(redenvelope.SuccessOpen)
+	data := datamap["data"].(map[string]interface{})
 	log.Printf("%d拆红包%+v：%+v, data为%+v", uid, envelope_id, code, data)
 	return code, data
 }
@@ -177,22 +177,26 @@ func TestWorkflow(t *testing.T) {
 		Header: make(http.Header),
 	}
 
-	uid := 15
+	uid := 17
 	red_envelope_cnt := 0
 	value := 0
 	// 期望抢30次红包可以走完这个流程
 	i := 0
+	max_count := -1
 	for ; i < 30; i += 1 {
 		code, sdata := Snatch(t, w, ctx, uid)
-		if code == 0 {
+		if sdata != nil {
+			max_count = int(sdata["max_count"].(float64))
+			envelope_id := int(sdata["envelope_id"].(float64))
+
 			// 抢到红包了，尝试拆开
 			red_envelope_cnt++
-			code, odata := Open(t, w, ctx, uid, sdata.EnvelopeID)
+			code, odata := Open(t, w, ctx, uid, envelope_id)
 			if code == 0 {
-				value += odata.Value
+				value += int(odata["value"].(float64))
 				log.Printf("第%d次抢到红包并且成功拆开，目前获得金额%d", red_envelope_cnt, value)
 			} else {
-				HandleERR(t, fmt.Errorf("拆刚得到的红包%d时出错，code为%d", sdata.EnvelopeID, code))
+				HandleERR(t, fmt.Errorf("拆刚得到的红包%d时出错，code为%d", envelope_id, code))
 			}
 			if red_envelope_cnt > ctx.GetInt(redenvelope.MaxCountField) {
 				HandleERR(t, fmt.Errorf("已经抢了%d次红包，超过正确限额%d", red_envelope_cnt, ctx.GetInt(redenvelope.MaxCountField)))
@@ -200,10 +204,10 @@ func TestWorkflow(t *testing.T) {
 		}
 		if code == 2 {
 			// 用户抢到限额了
-			if red_envelope_cnt == sdata.CurCount && sdata.CurCount == sdata.MaxCount && sdata.CurCount == ctx.GetInt(redenvelope.MaxCountField) {
+			if red_envelope_cnt == max_count && max_count == ctx.GetInt(redenvelope.MaxCountField) {
 				break
 			} else {
-				HandleERR(t, fmt.Errorf("到达限额时red_envelope_cnt: %d, sdata.CurCount: %d, sdata.MaxCount: %d, MaxCountField: %d 不相等", red_envelope_cnt, sdata.CurCount, sdata.MaxCount, ctx.GetInt(redenvelope.MaxCountField)))
+				HandleERR(t, fmt.Errorf("到达限额时red_envelope_cnt: %d, max_count: %d, MaxCountField: %d 不相等，-1可能是根本没抢到红包就到限额了", red_envelope_cnt, max_count, ctx.GetInt(redenvelope.MaxCountField)))
 			}
 		}
 	}
