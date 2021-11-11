@@ -16,23 +16,32 @@ echo "数据库创建成功"
 
 
 #创建表
-create_table_sql1="create table if not exists user (
-	uid int not null auto_increment,
-	amount int default null,
-	if_get bool  default false,
-	primary key (uid)
+create_table_sql="create table if not exists red_envelope (
+envelope_id int not null,
+uid int not null,
+opened bool default false,
+value int default null,
+snatch_time int not null,
+primary key(envelope_id)
 )ENGINE=innoDB DEFAULT CHARSET=utf8;"
 
-create_table_sql2="create table if not exists red_envelope (
-	envelope_id int not null auto_increment,
-	uid int default null,
-	opened bool default false,
-	value int default null,
-	snatch_time timestamp DEFAULT CURRENT_TIMESTAMP,
-	primary key(envelope_id)
-)ENGINE=innoDB DEFAULT CHARSET=utf8;"
+#create_table_sql1="create table if not exists user (
+#	uid int not null auto_increment,
+#	amount int default null,
+#	if_get bool  default false,
+#	primary key (uid)
+#)ENGINE=innoDB DEFAULT CHARSET=utf8;"
+#
+#create_table_sql2="create table if not exists red_envelope (
+#	envelope_id int not null auto_increment,
+#	uid int default null,
+#	opened bool default false,
+#	value int default null,
+#	snatch_time timestamp DEFAULT CURRENT_TIMESTAMP,
+#	primary key(envelope_id)
+#)ENGINE=innoDB DEFAULT CHARSET=utf8;"
 
-mysql -u${username} -p${password} -D${dbname} -e "${create_table_sql1} ${create_table_sql2}"
+mysql -u${username} -p${password} -D${dbname} -e "${create_table_sql}"
 echo "表单创建成功"
 
 
