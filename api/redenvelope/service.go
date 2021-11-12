@@ -171,13 +171,14 @@ func (u *User) QueryList() ([]*WalletList, error) {
 func GenerateRedEnvelopeValue(remainValue, remainAmount, maxValue, minValue int) int {
 	rand.Seed(time.Now().UnixNano())
 	averageValue := remainValue / remainAmount
-	for i := 0; i < 5; i++ {
-		value := int(float64(averageValue) * rand.ExpFloat64())
-		if value >= minValue && value <= maxValue {
-			return value
-		}
+	value := int(float64(averageValue) * rand.ExpFloat64())
+	if value < minValue {
+		return averageValue
+	} else if value > maxValue {
+		return maxValue
+	} else {
+		return value
 	}
-	return averageValue
 }
 
 func SnatchHistoryToMQ(uid int, pid int) error {
