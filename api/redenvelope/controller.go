@@ -204,7 +204,7 @@ func SnatchRedEnvelope(c *gin.Context) {
 		// 回滚操作，丢弃请求。
 		log.Println("MQ not working... Rollback & Return")
 		// 撤销上面的redis操作
-		err := Mapper.RemoveRedEnvelopeForUser(c, *r.UID, envelopeID)
+		_, err := Mapper.RemoveRedEnvelopeForUser(c, *r.UID, envelopeID)
 		if err != nil {
 			log.Printf("删除用户 %d 的红包 %d 失败\n", *r.UID, envelopeID)
 		}
@@ -235,21 +235,15 @@ func OpenRedEnvelope(c *gin.Context) {
 		HandleERR(c, 102, errors.New("UID or EnvelopeID is nil"))
 		return
 	}
-	// 判断userId和envelopeId是否匹配
-	owned, err := Mapper.CheckIfOwnRedEnvelope(c, *r.UID, *r.EnvelopeID)
-	if err != nil {
-		HandleERR(c, 203, err)
-		return
-	}
-	if !owned {
-		HandleOpenOK(c, 4, *r.UID, *r.EnvelopeID, nil)
-		return
-	}
-
 	// 用户拥有该红包，尝试拆红包
-	err = Mapper.RemoveRedEnvelopeForUser(c, *r.UID, *r.EnvelopeID)
+	success, err := Mapper.RemoveRedEnvelopeForUser(c, *r.UID, *r.EnvelopeID)
 	if err != nil {
 		HandleERR(c, 304, err)
+		return
+	}
+	if !success {
+		// 用户没有这个红包 或者 红包已经被拆开
+		HandleOpenOK(c, 4, *r.UID, *r.EnvelopeID, nil)
 		return
 	}
 

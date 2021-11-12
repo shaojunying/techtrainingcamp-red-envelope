@@ -80,11 +80,14 @@ func (*mapper) CheckIfOwnRedEnvelope(ctx context.Context, userId, redEnvelopeId 
 }
 
 //RemoveRedEnvelopeForUser 将红包从用户的红包列表中移除
-func (*mapper) RemoveRedEnvelopeForUser(ctx context.Context, userId, redEnvelopeId int) error {
+func (*mapper) RemoveRedEnvelopeForUser(ctx context.Context, userId, redEnvelopeId int) (bool, error) {
 	key := fmt.Sprintf(SetOfRedEnvelopePerUserKey, userId)
 	rdx := database.GetRdx()
-	err := rdx.SRem(ctx, key, redEnvelopeId).Err()
-	return err
+	result, err := rdx.SRem(ctx, key, redEnvelopeId).Result()
+	if err != nil {
+		return false, errors.New("failed to remove red envelope for user, err: " + err.Error())
+    }
+	return int(result) != 0, err
 }
 
 //IncreaseCurEnvelopeId 自增目前最大的红包id，并返回自增之后的结果
