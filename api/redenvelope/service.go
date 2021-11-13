@@ -173,7 +173,7 @@ func GenerateRedEnvelopeValue(remainValue, remainAmount, maxValue, minValue int)
 	averageValue := remainValue / remainAmount
 	value := int(float64(averageValue) * rand.ExpFloat64())
 	if value < minValue {
-		return averageValue
+		return minValue
 	} else if value > maxValue {
 		return maxValue
 	} else {
