@@ -3,6 +3,7 @@ package routers
 import (
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	"red_envelope/api/redenvelope"
 	"red_envelope/middleware"
 )
@@ -14,6 +15,13 @@ func InitRouter() *gin.Engine {
 	//limitRate := int64(viper.GetInt("limitRate"))
 	//limitCapacity := int64(viper.GetInt("limitCapacity"))
 	//router.Use(middleware.RateLimitMiddleware(time.Second, limitRate, limitCapacity))
+
+	milliseconds := int64(viper.GetInt("cheat-preventing.milliseconds"))
+	if milliseconds == 0 {
+		milliseconds = 1000
+	}
+
+	router.Use(middleware.CheatPreventingMiddleware(milliseconds))
 	router.Use(middleware.ConfigLoadingMiddleware())
 	setUpRouter(router)
 	return router

@@ -2,6 +2,7 @@ package redenvelope
 
 import (
 	"errors"
+	"github.com/gin-gonic/gin/binding"
 	"log"
 	"math/rand"
 	"net/http"
@@ -69,6 +70,9 @@ func HandleERR(c *gin.Context, code int, err error) {
 	case 101, 102:
 		msg = "请求参数有误"
 		httpcode = http.StatusBadRequest
+	case 103:
+		msg = "请求过于频繁"
+		httpcode = http.StatusBadRequest
 	case 201, 202:
 		msg = "查询时有误"
 	case 301, 302, 303:
@@ -88,7 +92,7 @@ func HandleERR(c *gin.Context, code int, err error) {
 func SnatchRedEnvelope(c *gin.Context) {
 	var r RedEnvelope
 	//匹配参数
-	err := c.ShouldBind(&r)
+	err := c.ShouldBindBodyWith(&r, binding.JSON)
 	if err != nil {
 		HandleERR(c, 101, err)
 		return
@@ -227,7 +231,7 @@ func SnatchRedEnvelope(c *gin.Context) {
 func OpenRedEnvelope(c *gin.Context) {
 	var r RedEnvelope
 	//匹配参数
-	if err := c.ShouldBind(&r); err != nil {
+	if err := c.ShouldBindBodyWith(&r, binding.JSON); err != nil {
 		HandleERR(c, 101, err)
 		return
 	}
@@ -300,7 +304,7 @@ func OpenRedEnvelope(c *gin.Context) {
 func GetWalletList(c *gin.Context) {
 	var r RedEnvelope
 	//匹配参数
-	if err := c.ShouldBind(&r); err != nil {
+	if err := c.ShouldBindBodyWith(&r, binding.JSON); err != nil {
 		HandleERR(c, 101, err)
 		return
 	}
