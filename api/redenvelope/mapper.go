@@ -3,8 +3,10 @@ package redenvelope
 import (
 	"errors"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"red_envelope/database"
 	"strconv"
+	"time"
 
 	"github.com/go-redis/redis/v8"
 	"golang.org/x/net/context"
@@ -232,5 +234,29 @@ func (*mapper) GetConfigParameters(ctx context.Context) (*Config, error) {
 func (*mapper) SetConfigParameters(ctx context.Context, configMap map[string]interface{}) error {
 	rdx := database.GetRdx()
 	err := rdx.HSet(ctx, ConfigKey, configMap).Err()
+	return err
+}
+
+func (m *mapper) GetLastRequestTime(ctx context.Context, uid int) (int64, error) {
+	key := fmt.Sprintf(LastRequestTimeKey, uid)
+	rdx := database.GetRdx()
+	value, err := rdx.Get(ctx, key).Result()
+	if err != nil && err != redis.Nil {
+		return -1, err
+	}
+	if err == redis.Nil {
+		return 0, nil
+	}
+	lastRequestTime, err := strconv.ParseInt(value, 10, 64)
+	if err != nil {
+        return -1, err
+    }
+	return lastRequestTime, nil
+}
+
+func (m *mapper) UpdateLastRequestTime(c *gin.Context, uid int, unix int64, milliseconds int64) error {
+	key := fmt.Sprintf(LastRequestTimeKey, uid)
+	rdx := database.GetRdx()
+	err := rdx.Set(c, key, unix, time.Millisecond*time.Duration(milliseconds)).Err()
 	return err
 }

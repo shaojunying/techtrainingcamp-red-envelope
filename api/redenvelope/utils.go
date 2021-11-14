@@ -21,6 +21,9 @@ var OpenedEnvelopesKey = "opened_envelopes"
 //SpentBudgetKey 目前已花费的预算
 var SpentBudgetKey = "spent_budget"
 
+// LastRequestTimeKey 当前用户上一次请求的时间戳
+var LastRequestTimeKey = "last_request_time_%d"
+
 //MaxCountField 每个用户最多可抢到的次数
 var MaxCountField = "max_count"
 

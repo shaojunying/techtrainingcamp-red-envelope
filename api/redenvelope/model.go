@@ -8,6 +8,10 @@ package redenvelope
 //}
 //
 
+type CheatPreventing struct {
+	UID    *int    `json:"uid"`
+}
+
 type RedEnvelope struct {
 	EnvelopeID *int `gorm:"primary_key" json:"envelope_id"`
 	UID        *int `json:"uid"`
