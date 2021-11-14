@@ -276,7 +276,7 @@ func OpenRedEnvelope(c *gin.Context) {
 	}
 
 	// 将红包id、红包金额写入MQ
-	err = OpenValueToMQ(*r.UID, money)
+	err = OpenValueToMQ(*r.EnvelopeID, money)
 	if err != nil {
 		HandleERR(c, 402, err)
 		// 回滚操作，丢弃请求。
