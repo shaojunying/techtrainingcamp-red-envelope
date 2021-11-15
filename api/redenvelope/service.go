@@ -83,17 +83,38 @@ func (r *RedEnvelope) QueryListSql() (map[string]interface{}, error) {
 	return data, nil
 }
 
+// QueryKoiListSql 数据库获取锦鲤列表
+func QueryKoiListSql() ([]*Koi, error) {
+	db := database.GetDB()
+
+	//事务开始
+	tx := db.Begin()
+	//同步失败则将数据库回退
+	defer func() {
+		tx.Rollback()
+	}()
+
+	var ks []*Koi
+	if err := tx.Table("red_envelope").Raw("select uid, sum(value) as amount from red_envelope group by uid order by amount desc limit 10").Find(&ks).Error; err != nil {
+		return nil, err
+	}
+
+	tx.Commit()
+	return ks, nil
+}
+
 // 生成红包金额
 func GenerateRedEnvelopeValue(remainValue, remainAmount, maxValue, minValue int) int {
 	rand.Seed(time.Now().UnixNano())
 	averageValue := remainValue / remainAmount
-	for i := 0; i < 5; i++ {
-		value := int(float64(averageValue) * rand.ExpFloat64())
-		if value >= minValue && value <= maxValue {
-			return value
-		}
+	value := int(float64(averageValue) * rand.ExpFloat64())
+	if value < minValue {
+		return minValue
+	} else if value > maxValue {
+		return maxValue
+	} else {
+		return value
 	}
-	return averageValue
 }
 
 func SnatchHistoryToMQ(uid int, pid int) error {

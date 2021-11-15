@@ -11,11 +11,8 @@ function request()
     body = '{"uid":%s}'
     uid = math.random(10000000)
     body = string.format(body, uid)
-    path = "/redenvelope/snatch"
     return wrk.format(nil, path, nil, body)
 end
 
 function response(status, headers, body)
-    local res = json.decode(body)
-    data = res["data"]
 end

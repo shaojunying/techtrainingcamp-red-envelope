@@ -23,6 +23,7 @@ uid int not null,
 opened bool default false,
 value int default null,
 snatch_time int not null,
+INDEX index_id (uid),
 primary key(envelope_id)
 )ENGINE=innoDB DEFAULT CHARSET=utf8;"
 

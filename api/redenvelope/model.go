@@ -57,3 +57,8 @@ type Config struct {
 	// MaxValue 每个红包的最大金额（以分为单位）
 	MaxValue *int `json:"max_value"`
 }
+
+type Koi struct {
+	UID    int `json:"uid"`
+	Amount int `json:"amount"`
+}

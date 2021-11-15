@@ -344,6 +344,7 @@ func SetRedEnvelopeConfig(c *gin.Context) {
 		})
 		return
 	}
+	finalConfig, _ := Mapper.GetConfigParameters(c)
 	configMap := make(map[string]interface{})
 	if config.MaxCount != nil {
 		c.Set(MaxCountField, *config.MaxCount)
@@ -356,31 +357,53 @@ func SetRedEnvelopeConfig(c *gin.Context) {
 	if config.Budget != nil {
 		c.Set(BudgetField, *config.Budget)
 		configMap[BudgetField] = *config.Budget
+		finalConfig.Budget = config.Budget
 	}
 	if config.TotalNumber != nil {
 		c.Set(TotalNumberField, *config.TotalNumber)
 		configMap[TotalNumberField] = *config.TotalNumber
+		finalConfig.TotalNumber = config.TotalNumber
 	}
 	if config.MinValue != nil {
 		c.Set(MinValueField, *config.MinValue)
 		configMap[MinValueField] = *config.MinValue
+		finalConfig.MinValue = config.MinValue
 	}
 	if config.MaxValue != nil {
 		c.Set(MaxValueField, *config.MaxValue)
 		configMap[MaxValueField] = *config.MaxValue
 	}
-	err := Mapper.SetConfigParameters(c, configMap)
-
-	if err != nil {
+	if finalConfig.Budget != nil && finalConfig.TotalNumber != nil && finalConfig.MinValue != nil && *finalConfig.TotalNumber**finalConfig.MinValue > *finalConfig.Budget {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    -1,
-			"message": "设置红包全局配置失败",
+			"message": "预算不足以发出最小金额的红包",
 		})
 		return
+	} else {
+		if err := Mapper.SetConfigParameters(c, configMap); err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{
+				"code":    -1,
+				"message": "设置红包全局配置失败",
+			})
+			return
+		}
 	}
 	c.JSON(http.StatusOK, gin.H{
 		"code": 0,
 		"msg":  "success",
+	})
+}
+
+func CatchKoi(c *gin.Context) {
+	ks, err := QueryKoiListSql()
+	if err != nil {
+		HandleERR(c, 501, err)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code": 0,
+		"msg":  "抓锦鲤成功",
+		"data": ks,
 	})
 }
 
