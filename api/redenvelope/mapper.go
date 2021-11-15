@@ -3,8 +3,10 @@ package redenvelope
 import (
 	"errors"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"red_envelope/database"
 	"strconv"
+	"time"
 
 	"github.com/go-redis/redis/v8"
 	"golang.org/x/net/context"
@@ -80,11 +82,14 @@ func (*mapper) CheckIfOwnRedEnvelope(ctx context.Context, userId, redEnvelopeId 
 }
 
 //RemoveRedEnvelopeForUser 将红包从用户的红包列表中移除
-func (*mapper) RemoveRedEnvelopeForUser(ctx context.Context, userId, redEnvelopeId int) error {
+func (*mapper) RemoveRedEnvelopeForUser(ctx context.Context, userId, redEnvelopeId int) (bool, error) {
 	key := fmt.Sprintf(SetOfRedEnvelopePerUserKey, userId)
 	rdx := database.GetRdx()
-	err := rdx.SRem(ctx, key, redEnvelopeId).Err()
-	return err
+	result, err := rdx.SRem(ctx, key, redEnvelopeId).Result()
+	if err != nil {
+		return false, errors.New("failed to remove red envelope for user, err: " + err.Error())
+    }
+	return int(result) != 0, err
 }
 
 //IncreaseCurEnvelopeId 自增目前最大的红包id，并返回自增之后的结果
@@ -232,5 +237,29 @@ func (*mapper) GetConfigParameters(ctx context.Context) (*Config, error) {
 func (*mapper) SetConfigParameters(ctx context.Context, configMap map[string]interface{}) error {
 	rdx := database.GetRdx()
 	err := rdx.HSet(ctx, ConfigKey, configMap).Err()
+	return err
+}
+
+func (m *mapper) GetLastRequestTime(ctx context.Context, uid int) (int64, error) {
+	key := fmt.Sprintf(LastRequestTimeKey, uid)
+	rdx := database.GetRdx()
+	value, err := rdx.Get(ctx, key).Result()
+	if err != nil && err != redis.Nil {
+		return -1, err
+	}
+	if err == redis.Nil {
+		return 0, nil
+	}
+	lastRequestTime, err := strconv.ParseInt(value, 10, 64)
+	if err != nil {
+        return -1, err
+    }
+	return lastRequestTime, nil
+}
+
+func (m *mapper) UpdateLastRequestTime(c *gin.Context, uid int, unix int64, milliseconds int64) error {
+	key := fmt.Sprintf(LastRequestTimeKey, uid)
+	rdx := database.GetRdx()
+	err := rdx.Set(c, key, unix, time.Millisecond*time.Duration(milliseconds)).Err()
 	return err
 }
