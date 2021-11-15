@@ -6,40 +6,45 @@ local json = require "json"
 
 wrk.method = "POST"
 wrk.headers["Content-Type"] = "application/json"
-local uid = 1 --- 根据数据库情况设置，
+local uid = 2050 --- 根据数据库情况设置，
 local envelope_id = 0
+local e_uid = 0
 local path = "/redenvelope/snatch"
-local body = '{"uid": 1}'
+local body = '{"uid": 0}'
 local data = ""
 
 function request()
-    --- 只有当上一个请求为抢红包并且拿到的data不为空时才发送拆红包请求
-    if (path == "/redenvelope/snatch") then
-        if (data ~= nil) then
-            ---print("open", data["envelope_id"])
-            envelope_id = data["envelope_id"]
-            path = "/redenvelope/open"
-            body = '{"uid":%s,"envelope_id":%s}'
-            body = string.format(body, uid, envelope_id)
-        else
-            ---print("data==nil")
-            body = '{"uid":%s}'
-            uid = uid + 1
-            body = string.format(body, uid)
-            path = "/redenvelope/snatch"
-        end
-    else
-        ---print("snatch")
-        body = '{"uid":%s}'
-        uid = uid + 1
-        body = string.format(body, uid)
-        path = "/redenvelope/snatch"
-    end
-    ---print(body, path)
+    -- 只有当上一个请求为抢红包并且拿到的data不为空时才发送拆红包请求
+    --if (path == "/redenvelope/snatch") then
+    --    if (data ~= nil) then
+    --        envelope_id = data["envelope_id"]
+    --        e_uid = data["uid"] --- 高并发下，uid并不一定与红包id匹配，必须重新获取
+    --        path = "/redenvelope/open"
+    --        body = '{"uid":%s,"envelope_id":%s}'
+    --        --- print(e_uid, envelope_id)
+    --        body = string.format(body, e_uid, envelope_id)
+    --    else
+    --        body = '{"uid":%s}'
+    --        uid = uid + 1
+    --        body = string.format(body, uid)
+    --        path = "/redenvelope/snatch"
+    --    end
+    --else
+    --    body = '{"uid":%s}'
+    --    uid = uid + 1
+    --    body = string.format(body, uid)
+    --    path = "/redenvelope/snatch"
+    --end
+    -- print(body, path)
+
+    -- 先只测试snatch
+    uid = uid + 1
+    body = string.format(body, uid)
     return wrk.format(nil, path, nil, body)
 end
 
-function response(status, headers, body)
-    local res = json.decode(body)
+function response(status, headers, r_body)
+    local res = json.decode(r_body)
+    print(json.encode(r_body))
     data = res["data"]
 end

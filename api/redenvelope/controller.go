@@ -389,6 +389,19 @@ func SetRedEnvelopeConfig(c *gin.Context) {
 	}
 }
 
+func CatchKoi(c *gin.Context) {
+	ks, err := QueryKoiListSql()
+	if err != nil {
+		HandleERR(c, 501, err)
+		return
+	}
+	c.JSON(http.StatusOK, gin.H{
+		"code": 0,
+		"msg":  "抓锦鲤成功",
+		"data": ks,
+	})
+}
+
 // WrkTest 压力测试
 func WrkTest(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{

@@ -9,4 +9,5 @@ func RegisterRedEnvelopeRouter(r *gin.RouterGroup) {
 	RedEnvelopeAPI.POST("/get_wallet_list", GetWalletList) // 获取红包列表
 	RedEnvelopeAPI.GET("/wrktest", WrkTest)                // 压测
 	RedEnvelopeAPI.POST("/config", SetRedEnvelopeConfig)   // 设置红包全局配置
+	RedEnvelopeAPI.POST("/catch_koi", CatchKoi)            // 抓锦鲤
 }
