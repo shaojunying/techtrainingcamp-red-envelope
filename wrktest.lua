@@ -44,7 +44,7 @@ function request()
 end
 
 function response(status, headers, r_body)
-    local res = json.decode(r_body)
-    print(json.encode(r_body))
-    data = res["data"]
+    --local res = json.decode(r_body)
+    --print(json.encode(r_body))
+    --data = res["data"]
 end
