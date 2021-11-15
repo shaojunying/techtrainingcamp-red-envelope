@@ -344,7 +344,7 @@ func SetRedEnvelopeConfig(c *gin.Context) {
 		})
 		return
 	}
-	var configMap map[string]interface{}
+	configMap := make(map[string]interface{})
 	if config.MaxCount != nil {
 		c.Set(MaxCountField, *config.MaxCount)
 		configMap[MaxCountField] = *config.MaxCount
@@ -378,6 +378,10 @@ func SetRedEnvelopeConfig(c *gin.Context) {
 		})
 		return
 	}
+	c.JSON(http.StatusOK, gin.H{
+		"code": 0,
+		"msg":  "success",
+	})
 }
 
 // WrkTest 压力测试

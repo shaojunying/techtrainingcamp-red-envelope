@@ -173,6 +173,47 @@ func TestGetWalletList(t *testing.T) {
 	t.Log("红包列表：", data["envelope_list"])
 }
 
+func TestSetRedEnvelopeConfig(t *testing.T) {
+	//读取配置
+	config.InitConf()
+
+	//启动数据库
+	db := database.InitDB()
+	defer db.Close()
+	database.InitRedis()
+
+	err := database.InitMQ()
+	HandleERR(t, err)
+	defer database.CloseMQ()
+
+	w := httptest.NewRecorder()
+	ctx, _ := gin.CreateTestContext(w)
+	ctx.Request = &http.Request{
+		Header: make(http.Header),
+	}
+	max_count := 999999
+	probability := 0.5
+	budget := 100000000
+	total_number := 1000000
+	min_value := 1
+	max_value := 10000
+	MockJsonPost(ctx, map[string]interface{}{"max_count": max_count, "probability": probability,
+		"budget": budget, "total_number": total_number, "min_value": min_value, "max_value": max_value})
+	redenvelope.SetRedEnvelopeConfig(ctx)
+	assert.Equal(t, w.Code, http.StatusOK)
+	body, err := ioutil.ReadAll(w.Body)
+	HandleERR(t, err)
+	var datamap map[string]interface{}
+	err = json.Unmarshal(body, &datamap)
+	HandleERR(t, err)
+	code := int(datamap["code"].(float64))
+
+	if code != 0 {
+		t.Log("err, not expected code, the code is", code)
+		t.FailNow()
+	}
+}
+
 func TestWorkflow(t *testing.T) {
 	//读取配置
 	config.InitConf()

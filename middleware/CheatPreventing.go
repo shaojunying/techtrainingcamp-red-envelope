@@ -1,12 +1,13 @@
 package middleware
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
-	"github.com/pkg/errors"
 	"log"
 	"red_envelope/api/redenvelope"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/pkg/errors"
 )
 
 func CheatPreventing(c *gin.Context, milliseconds int64) {
@@ -14,7 +15,7 @@ func CheatPreventing(c *gin.Context, milliseconds int64) {
 	r := redenvelope.CheatPreventing{}
 	err := c.ShouldBindBodyWith(&r, binding.JSON)
 	if err != nil {
-		redenvelope.HandleERR(c, 101, err)
+		// 匹配不到说明没有uid，可能是别的接口
 		return
 	}
 	if r.UID == nil {
@@ -29,7 +30,7 @@ func CheatPreventing(c *gin.Context, milliseconds int64) {
 		return
 	}
 	// time.Now().UnixNano()/1_000_000 获取的是毫秒时间戳（13位）
-	now := time.Now().UnixNano()/1_000_000
+	now := time.Now().UnixNano() / 1_000_000
 	if lastTime != 0 && lastTime+milliseconds > now {
 		redenvelope.HandleERR(c, 103, errors.New("请求过于频繁"))
 		c.Abort()
@@ -40,8 +41,6 @@ func CheatPreventing(c *gin.Context, milliseconds int64) {
 	if err != nil {
 		log.Println("更新uid的请求时间失败, err: ", err)
 	}
-	c.Next()
-	return
 }
 
 //CheatPreventingMiddleware 防作弊中间件
