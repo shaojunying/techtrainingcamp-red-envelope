@@ -49,6 +49,5 @@ func CheatPreventingMiddleware(milliseconds int64) gin.HandlerFunc {
 
 	return func(c *gin.Context) {
 		CheatPreventing(c, milliseconds)
-		c.Next()
 	}
 }
