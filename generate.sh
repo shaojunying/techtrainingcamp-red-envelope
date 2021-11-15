@@ -1,8 +1,9 @@
 #! bin/bash
 set -e
 
-username="root" 
-password="root"
+username="developer" 
+password="Group1234."
+host="111.62.122.65"
 
 dbname="red_envelope_rain" #数据库名称
 
@@ -11,7 +12,7 @@ dbname="red_envelope_rain" #数据库名称
 drop_db_sql="drop database if exists ${dbname};"
 create_db_sql="create database if not exists ${dbname};"
 
-mysql -u${username} -p${password} -e "${drop_db_sql} ${create_db_sql}"
+mysql -h${host} -u${username} -p${password} -e "${drop_db_sql} ${create_db_sql}"
 echo "数据库创建成功"
 
 
@@ -41,7 +42,7 @@ primary key(envelope_id)
 #	primary key(envelope_id)
 #)ENGINE=innoDB DEFAULT CHARSET=utf8;"
 
-mysql -u${username} -p${password} -D${dbname} -e "${create_table_sql}"
+mysql -h${host} -u${username} -p${password} -D${dbname} -e "${create_table_sql}"
 echo "表单创建成功"
 
 

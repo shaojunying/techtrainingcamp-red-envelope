@@ -10,7 +10,7 @@ require (
 	github.com/jinzhu/gorm v1.9.16
 	github.com/juju/ratelimit v1.0.1
 	github.com/magiconair/properties v1.8.5
-	github.com/pkg/errors v0.8.1 // indirect
+	github.com/pkg/errors v0.8.1
 	github.com/spf13/viper v1.9.0
 	golang.org/x/net v0.0.0-20210805182204-aaa1db679c0d
 	golang.org/x/tools/gopls v0.7.3 // indirect

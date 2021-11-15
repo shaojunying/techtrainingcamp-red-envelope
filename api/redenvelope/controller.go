@@ -2,11 +2,12 @@ package redenvelope
 
 import (
 	"errors"
-	"github.com/gin-gonic/gin/binding"
 	"log"
 	"math/rand"
 	"net/http"
 	"time"
+
+	"github.com/gin-gonic/gin/binding"
 
 	"github.com/gin-gonic/gin"
 )
@@ -313,10 +314,13 @@ func GetWalletList(c *gin.Context) {
 		return
 	}
 	list, err := r.QueryListSql()
-	log.Printf("%d获取到的红包列表有：\n", r.UID)
-	for _, pWalletList := range list["envelope_list"].([]*WalletList) {
-		log.Printf("%+v\n", *pWalletList)
+	if list != nil {
+		log.Printf("%d获取到的红包列表有：\n", *r.UID)
+		for _, pWalletList := range list["envelope_list"].([]*WalletList) {
+			log.Printf("%+v\n", *pWalletList)
+		}
 	}
+
 	if err != nil {
 		HandleERR(c, 206, err)
 		return
