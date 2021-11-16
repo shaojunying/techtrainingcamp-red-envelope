@@ -1,14 +1,16 @@
 package routers
 
 import (
-	"github.com/gin-contrib/pprof"
-	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 	"red_envelope/api/redenvelope"
 	"red_envelope/middleware"
+
+	//"github.com/gin-contrib/pprof"
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 )
 
 func InitRouter() *gin.Engine {
+	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
 	//测试阶段，先将令牌桶注释
 	//加入限制器，限制能通过的最大流量，多余流量将被舍弃
@@ -26,7 +28,7 @@ func InitRouter() *gin.Engine {
 
 // 设置路由
 func setUpRouter(router *gin.Engine, milliseconds int64) {
-	pprof.Register(router) // 注册pprof路由
+	//pprof.Register(router) // 注册pprof路由
 	otherApi := router.Group("/")
 
 	// 这组路由不走防作弊检查

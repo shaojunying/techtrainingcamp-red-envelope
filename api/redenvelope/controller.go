@@ -24,7 +24,7 @@ func HandleSnatchOK(c *gin.Context, code int, uid int, data *SuccessSnatch) {
 	case 3:
 		msg = "红包已全部发完"
 	}
-	log.Printf("%v的用户正常响应：%v\n", uid, msg)
+	//log.Printf("%v的用户正常响应：%v\n", uid, msg)
 	if data == nil {
 		c.JSON(http.StatusOK, gin.H{
 			"code": code,
@@ -48,7 +48,7 @@ func HandleOpenOK(c *gin.Context, code int, uid int, envelopeid int, data *Succe
 	case 4:
 		msg = "不能拆未拥有的或者已拆开的红包"
 	}
-	log.Printf("%v的用户拆%v的红包正常响应：%v\n", uid, envelopeid, msg)
+	//log.Printf("%v的用户拆%v的红包正常响应：%v\n", uid, envelopeid, msg)
 	if data == nil {
 		c.JSON(http.StatusOK, gin.H{
 			"code": code,
@@ -81,7 +81,7 @@ func HandleERR(c *gin.Context, code int, err error) {
 	case 401, 402:
 		msg = "其他错误"
 	}
-	log.Printf("%v，错误码：%v，具体错误为：%v\n", msg, code, err)
+	//log.Printf("%v，错误码：%v，具体错误为：%v\n", msg, code, err)
 	c.JSON(httpcode, gin.H{
 		"code": code,
 		"msg":  msg,
@@ -103,20 +103,20 @@ func SnatchRedEnvelope(c *gin.Context) {
 		HandleERR(c, 102, errors.New("user.UID is nil"))
 		return
 	}
-	log.Printf("用户 %d 开始抢红包\n", *r.UID)
+	//log.Printf("用户 %d 开始抢红包\n", *r.UID)
 
 	// 只有一定概率抢到红包
 	rand.Seed(time.Now().UnixNano())
 	num := rand.Float64()                         //随机数
 	probability := c.GetFloat64(ProbabilityField) //抢到的概率值 %
-	log.Printf("用户 %d 抽到了随机数 %f，小于 %f 可以抢到红包", *r.UID, num, probability)
+	//log.Printf("用户 %d 抽到了随机数 %f，小于 %f 可以抢到红包", *r.UID, num, probability)
 	if num > probability {
 		HandleSnatchOK(c, 1, *r.UID, nil)
 		return
 	}
 
 	maxCount := c.GetInt(MaxCountField)
-	log.Printf("成功获取最大的可抢红包限额: %d\n", maxCount)
+	//log.Printf("成功获取最大的可抢红包限额: %d\n", maxCount)
 
 
 	out1 := make(chan Result)
@@ -137,7 +137,7 @@ func SnatchRedEnvelope(c *gin.Context) {
 		return
 	}
 	numberOfEnvelopesForALlUser := result.val
-	log.Printf("成功获取系统已发红包总数: %d\n", numberOfEnvelopesForALlUser)
+	//log.Printf("成功获取系统已发红包总数: %d\n", numberOfEnvelopesForALlUser)
 
 	result = <-out2
 	if result.err != nil {
@@ -145,7 +145,7 @@ func SnatchRedEnvelope(c *gin.Context) {
 		return
 	}
 	curCount := result.val
-	log.Printf("成功获取用户 %d 已抢红包数目: %d\n", *r.UID, curCount)
+	//log.Printf("成功获取用户 %d 已抢红包数目: %d\n", *r.UID, curCount)
 
 	// 判断用户是否超过红包数限额
 	if curCount >= maxCount {
@@ -188,7 +188,7 @@ func SnatchRedEnvelope(c *gin.Context) {
 		return
 	}
 	numberOfEnvelopesForAllUser := result.val
-	log.Printf("成功增加系统已发红包总数: %d\n", numberOfEnvelopesForAllUser)
+	//log.Printf("成功增加系统已发红包总数: %d\n", numberOfEnvelopesForAllUser)
 
 	result = <- out4
 	if result.err != nil {
@@ -203,7 +203,7 @@ func SnatchRedEnvelope(c *gin.Context) {
 		return
 	}
 	envelopeID := result.val
-	log.Printf("成功为用户 %d 生成红包 %d\n", *r.UID, envelopeID)
+	//log.Printf("成功为用户 %d 生成红包 %d\n", *r.UID, envelopeID)
 
 	// 判断增加之后是否超额
 	if numberOfEnvelopesForAllUser >= c.GetInt(TotalNumberField) {
@@ -211,16 +211,16 @@ func SnatchRedEnvelope(c *gin.Context) {
 		// 递减刚刚增加的红包
 		err := Mapper.DecreaseOpenedEnvelopes(c)
 		if err != nil {
-			log.Printf("撤销对系统已发红包总数的自增失败")
+			//log.Printf("撤销对系统已发红包总数的自增失败")
 		}
 		log.Printf("增加完已抢红包数，用户 %d 已抢红包数超过限额，尝试取消上一步操作\n", *r.UID)
 		err = Mapper.DecreaseRedEnvelopes(c, *r.UID)
 		if err != nil {
-			log.Printf("撤销 增加用户 %d 已抢红包数失败\n", *r.UID)
+			//log.Printf("撤销 增加用户 %d 已抢红包数失败\n", *r.UID)
 		}
 		err = Mapper.DecreaseNumberOfEnvelopesForAllUser(c)
 		if err != nil {
-			log.Printf("撤销 增加已抢红包总数失败\n")
+			//log.Printf("撤销 增加已抢红包总数失败\n")
 		}
 		log.Printf("取消用户 %d 已抢红包数成功\n", *r.UID)
 		HandleSnatchOK(c, 3, *r.UID, nil)
@@ -229,48 +229,48 @@ func SnatchRedEnvelope(c *gin.Context) {
 
 	// 可能因为并发抢红包的情况，导致用户已抢的红包数超过限额，这时候需要减少已抢红包数（否则配置更新将会出错）
 	if curCount > maxCount {
-		log.Printf("增加完已抢红包数，用户 %d 已抢红包数超过限额，尝试取消上一步操作\n", *r.UID)
+		//log.Printf("增加完已抢红包数，用户 %d 已抢红包数超过限额，尝试取消上一步操作\n", *r.UID)
 		err = Mapper.DecreaseRedEnvelopes(c, *r.UID)
 		if err != nil {
-			log.Printf("撤销 增加用户 %d 已抢红包数失败\n", *r.UID)
+			//log.Printf("撤销 增加用户 %d 已抢红包数失败\n", *r.UID)
 		}
 		err = Mapper.DecreaseNumberOfEnvelopesForAllUser(c)
 		if err != nil {
-			log.Printf("撤销 增加已抢红包总数失败\n")
+			//log.Printf("撤销 增加已抢红包总数失败\n")
 		}
-		log.Printf("取消用户 %d 已抢红包数成功\n", *r.UID)
+		//log.Printf("取消用户 %d 已抢红包数成功\n", *r.UID)
 		HandleSnatchOK(c, 2, *r.UID, nil)
 		return
 	}
 
 	// 成功增加了已抢红包数量，生成红包id并添加到set中
-	log.Printf("成功增加了用户 %d 已抢红包数量，准备生成红包id并添加到set中\n", *r.UID)
+	//log.Printf("成功增加了用户 %d 已抢红包数量，准备生成红包id并添加到set中\n", *r.UID)
 
 	err = Mapper.AddRedEnvelopeToUserId(c, *r.UID, envelopeID)
 	if err != nil {
 		HandleERR(c, 303, err)
 		return
 	}
-	log.Printf("成功为用户 %d 添加红包 %d\n", *r.UID, envelopeID)
+	//log.Printf("成功为用户 %d 添加红包 %d\n", *r.UID, envelopeID)
 
 	// 将红包、用户信息写入MQ
 	err = SnatchHistoryToMQ(*r.UID, envelopeID)
 	if err != nil {
 		HandleERR(c, 402, err)
 		// 回滚操作，丢弃请求。
-		log.Println("MQ not working... Rollback & Return")
+		//log.Println("MQ not working... Rollback & Return")
 		// 撤销上面的redis操作
 		_, err := Mapper.RemoveRedEnvelopeForUser(c, *r.UID, envelopeID)
 		if err != nil {
-			log.Printf("删除用户 %d 的红包 %d 失败\n", *r.UID, envelopeID)
+			//log.Printf("删除用户 %d 的红包 %d 失败\n", *r.UID, envelopeID)
 		}
 		err = Mapper.DecreaseRedEnvelopes(c, *r.UID)
 		if err != nil {
-			log.Printf("减少用户 %d 抢到的红包数\n", *r.UID)
+			//log.Printf("减少用户 %d 抢到的红包数\n", *r.UID)
 		}
 		err = Mapper.DecreaseNumberOfEnvelopesForAllUser(c)
 		if err != nil {
-			log.Printf("减少已发放的红包总数失败\n")
+			//log.Printf("减少已发放的红包总数失败\n")
 		}
 		return
 	}
@@ -332,19 +332,19 @@ func OpenRedEnvelope(c *gin.Context) {
 	if err != nil {
 		HandleERR(c, 402, err)
 		// 回滚操作，丢弃请求。
-		log.Println("MQ not working... Rollback & Return")
+		//log.Println("MQ not working... Rollback & Return")
 		// 撤销上面的redis操作
 		err := Mapper.DecreaseOpenedEnvelopes(c)
 		if err != nil {
-			log.Printf("减少已拆红包数失败\n")
+			//log.Printf("减少已拆红包数失败\n")
 		}
 		err = Mapper.DecreaseSpentBudget(c, money)
 		if err != nil {
-			log.Printf("减少已花费预算失败\n")
+			//log.Printf("减少已花费预算失败\n")
 		}
 		err = Mapper.AddRedEnvelopeToUserId(c, *r.UID, *r.EnvelopeID)
 		if err != nil {
-			log.Printf("将红包 %d 放入用户 %d 的红包集合失败\n", *r.EnvelopeID, *r.UID)
+			//log.Printf("将红包 %d 放入用户 %d 的红包集合失败\n", *r.EnvelopeID, *r.UID)
 		}
 		return
 	}
@@ -365,12 +365,12 @@ func GetWalletList(c *gin.Context) {
 		return
 	}
 	list, err := r.QueryListSql()
-	if list != nil {
-		log.Printf("%d获取到的红包列表有：\n", *r.UID)
-		for _, pWalletList := range list["envelope_list"].([]*WalletList) {
-			log.Printf("%+v\n", *pWalletList)
-		}
-	}
+	// if list != nil {
+	// 	log.Printf("%d获取到的红包列表有：\n", *r.UID)
+	// 	for _, pWalletList := range list["envelope_list"].([]*WalletList) {
+	// 		log.Printf("%+v\n", *pWalletList)
+	// 	}
+	// }
 
 	if err != nil {
 		HandleERR(c, 206, err)
