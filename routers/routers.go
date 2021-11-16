@@ -27,12 +27,13 @@ func InitRouter() *gin.Engine {
 // 设置路由
 func setUpRouter(router *gin.Engine, milliseconds int64) {
 	pprof.Register(router) // 注册pprof路由
-	api := router.Group("/")
+	otherApi := router.Group("/")
 
 	// 这组路由不走防作弊检查
-	redenvelope.RegisterOtherRouter(api.Group("/redenvelope"))
+	redenvelope.RegisterOtherRouter(otherApi.Group("/redenvelope"))
 
 	router.Use(middleware.CheatPreventingMiddleware(milliseconds))
 	router.Use(middleware.ConfigLoadingMiddleware())
-	redenvelope.RegisterRedEnvelopeRouter(api.Group("/redenvelope"))
+	coreApi := router.Group("/")
+	redenvelope.RegisterRedEnvelopeRouter(coreApi.Group("/redenvelope"))
 }
