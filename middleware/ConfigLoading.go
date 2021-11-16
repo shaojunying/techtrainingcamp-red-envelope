@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"log"
 	"net/http"
 	"red_envelope/api/redenvelope"
 
@@ -17,6 +18,9 @@ func LoadConfig(c *gin.Context) {
 		c.Abort()
 		return
 	}
+	log.Printf("成功获取配置信息。max_count: %d, probability: %g, budget: %d, total_number: %d," +
+		" max_value: %d, min_value: %d", *config.MaxCount, *config.Probability, *config.Budget, *config.TotalNumber,
+		*config.MaxValue, *config.MinValue)
 	c.Set(redenvelope.MaxCountField, *config.MaxCount)
 	c.Set(redenvelope.ProbabilityField, *config.Probability)
 	c.Set(redenvelope.BudgetField, *config.Budget)
