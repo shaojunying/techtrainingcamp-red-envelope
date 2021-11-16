@@ -396,6 +396,10 @@ func SetRedEnvelopeConfig(c *gin.Context) {
 		return
 	}
 	finalConfig, _ := Mapper.GetConfigParameters(c)
+	// 初始的时候没有数据 会返回空，需要手动创建对象
+	if finalConfig == nil {
+		finalConfig = &Config{}
+	}
 	configMap := make(map[string]interface{})
 	if config.MaxCount != nil {
 		c.Set(MaxCountField, *config.MaxCount)
