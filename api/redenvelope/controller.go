@@ -206,7 +206,7 @@ func SnatchRedEnvelope(c *gin.Context) {
 	if err != nil {
 		HandleERR(c, 402, err)
 		// 回滚操作，丢弃请求。
-		log.Println("MQ not working... Rollback & Return")
+		log.Println("MQ not working... Rollback & Return, err: ", err)
 		// 撤销上面的redis操作
 		_, err := Mapper.RemoveRedEnvelopeForUser(c, *r.UID, envelopeID)
 		if err != nil {
@@ -280,7 +280,7 @@ func OpenRedEnvelope(c *gin.Context) {
 	if err != nil {
 		HandleERR(c, 402, err)
 		// 回滚操作，丢弃请求。
-		//log.Println("MQ not working... Rollback & Return")
+		log.Println("MQ not working... Rollback & Return, err: ", err)
 		// 撤销上面的redis操作
 		err := Mapper.DecreaseOpenedEnvelopes(c)
 		if err != nil {
