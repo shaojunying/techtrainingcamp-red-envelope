@@ -28,9 +28,9 @@ minAmount: 100
 maxAmount: 3000
 #限制器
 #每秒放入的令牌数量
-limitRate: 1000
+limitRate: 4000
 #桶容量
-limitCapacity: 1000
+limitCapacity: 4000
 # 同一uid两次请求的最小时间间隔（以毫秒为单位）, 防作弊
 cheat-preventing:
   milliseconds: 1000
