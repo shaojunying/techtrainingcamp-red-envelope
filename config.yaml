@@ -2,9 +2,12 @@ server:
   port: 8080
 database:
   driverName: mysql
-  userName: developer
-  password: Group1234.
-  host: 111.62.122.65
+  #userName: developer
+  #password: Group1234.
+  #host: 111.62.122.65
+  userName: root
+  password: root
+  host: localhost
   database: red_envelope_rain
   #空闲时的最大连接数
   MaxOpenConns: 100
