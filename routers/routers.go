@@ -1,17 +1,20 @@
 package routers
 
 import (
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"github.com/spf13/viper"
 	"red_envelope/api/redenvelope"
 	"red_envelope/middleware"
 	"time"
-
-	"github.com/gin-gonic/gin"
-	"github.com/spf13/viper"
 )
 
 func InitRouter() *gin.Engine {
 	gin.SetMode(gin.ReleaseMode)
 	router := gin.Default()
+
+	router.Use(cors.Default())
+
 	//测试阶段，先将令牌桶注释
 	//加入限制器，限制能通过的最大流量，多余流量将被舍弃
 	limitRate := int64(viper.GetInt("limitRate"))
