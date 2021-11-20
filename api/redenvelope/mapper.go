@@ -140,7 +140,7 @@ func (*mapper) GetNumberOfEnvelopesForALlUser(ctx context.Context) (int, error) 
 func (*mapper) DecreaseNumberOfEnvelopesForAllUser(ctx context.Context) error {
 	key := NumberOfEnvelopesForAllUserKey
 	rdx := database.GetRdx()
-	err := rdx.Incr(ctx, key).Err()
+	err := rdx.Decr(ctx, key).Err()
 	return err
 }
 
