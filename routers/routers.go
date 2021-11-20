@@ -37,7 +37,7 @@ func setUpRouter(router *gin.Engine, milliseconds int64) {
 	// 这组路由不走防作弊检查
 	redenvelope.RegisterOtherRouter(otherApi.Group("/redenvelope"))
 
-	router.Use(middleware.CheatPreventingMiddleware(milliseconds))
+	//router.Use(middleware.CheatPreventingMiddleware(milliseconds))
 	router.Use(middleware.ConfigLoadingMiddleware())
 	coreApi := router.Group("/")
 	redenvelope.RegisterRedEnvelopeRouter(coreApi.Group("/redenvelope"))
