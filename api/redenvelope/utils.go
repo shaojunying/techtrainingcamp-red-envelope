@@ -28,7 +28,7 @@ var LastRequestTimeKey = "last_request_time_%d"
 var MaxCountField = "max_count"
 
 // ProbabilityField 每次抢到红包的概率
-var ProbabilityField = "probablity"
+var ProbabilityField = "probability"
 
 // BudgetField 总预算（以分为单位）
 var BudgetField = "budget"
