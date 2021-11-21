@@ -21,7 +21,7 @@
 
   - database.go 连接数据库
   
-- **wrktest.lua**
+- **wrksnatch.lua**
 
   - 本文件用于压力测试，文件中实现了每个请求自动迭代uid。使用时需要根据数据库已有uid进行设置
 
