@@ -150,7 +150,7 @@ func SnatchRedEnvelope(c *gin.Context) {
 	}
 	log.Printf("成功增加系统已发红包总数: %d\n", numberOfEnvelopesForAllUser)
 	// 判断增加之后是否超额
-	if numberOfEnvelopesForAllUser >= c.GetInt(TotalNumberField) {
+	if numberOfEnvelopesForAllUser > c.GetInt(TotalNumberField) {
 		// 递减刚刚增加的红包
 		err := Mapper.DecreaseNumberOfEnvelopesForAllUser(c)
 		if err != nil {
