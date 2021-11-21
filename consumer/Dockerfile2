@@ -1,0 +1,8 @@
+FROM golang:1.13-alpine
+ENV GOPROXY https://goproxy.cn,direct
+WORKDIR /app
+COPY . ./
+RUN rm consumer1.go
+RUN go mod download & go build -o /consumer
+EXPOSE 8080
+CMD [ "/consumer" ]

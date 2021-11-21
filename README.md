@@ -42,3 +42,15 @@
   - 使用方式：运行过程中，可以在 "http://localhost:8080/debug/pprof/" 中查看程序性能；
               压测场景下，可以先运行 "go tool pprof -http=:1234 http://localhost:8080/debug/pprof/profile?second=10" 再马上运行压力测试脚本，之后可以在 "http://localhost:1234" 中查看图形化堆栈调用（Graph）和火焰图（Flame Graph）等。
 
+## 消息队列消费者 consumer/
+
+本文件夹为一个独立项目，需要单独编译运行。
+
+容器化部署方法：
+
+```bash
+docker build -t cr-cn-beijing.volces.com/group1/consumer1:v0.3 -f Dockerfile1 .
+docker push cr-cn-beijing.volces.com/group1/consumer1:v0.3
+docker build -t cr-cn-beijing.volces.com/group1/consumer2:v0.3 -f Dockerfile2 .
+docker push cr-cn-beijing.volces.com/group1/consumer2:v0.3
+```
