@@ -1,0 +1,51 @@
+version: "2.2"
+
+services:
+  app:
+    image: shaojunying/red-envelope-rain:latest
+    ports:
+      - "8080:8080"
+    networks:
+      - app-net
+    cpus: 1
+    mem_limit: "128m"
+
+  redis:
+    image: redis:latest
+    restart: always
+    networks:
+      - app-net
+    cpus: 0.5
+    mem_limit: "128m"
+
+  rmqnamesrv:
+    image: foxiswho/rocketmq:4.8.0
+    command: sh mqnamesrv
+#    ports:
+#      - 9876:9876
+    environment:
+      - JAVA_OPT_EXT=-Xms512m -Xmx512m -Xmn128m
+    networks:
+      - app-net
+    cpus: 0.3
+    mem_limit: "512m"
+
+  rmqbroker:
+    image: foxiswho/rocketmq:4.8.0
+    command: sh mqbroker
+#    ports:
+#      - 10911:10911
+#      - 10909:10909
+#      - 10912:10912
+    environment:
+      - JAVA_OPT_EXT=-Xms512m -Xmx512m -Xmn128m
+      - NAMESRV_ADDR=rmqnamesrv:9876
+      - autuCreateTopicEnable=true
+    networks:
+      - app-net
+#    cpuset: "0"
+#    mem_limit: "512m"
+
+
+networks:
+  app-net:

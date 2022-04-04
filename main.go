@@ -18,8 +18,8 @@ func main() {
 	config.InitConf()
 
 	//启动数据库
-	db := database.InitDB()
-	defer db.Close()
+	//db := database.InitDB()
+	//defer db.Close()
 	database.InitRedis()
 
 	err := database.InitMQ()

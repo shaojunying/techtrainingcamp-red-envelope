@@ -10,22 +10,19 @@ var Rdx *redis.Client
 
 func InitRedis() {
 	addr := viper.GetString("redis.addr")
-	username := viper.GetString("redis.username")
-	password := viper.GetString("redis.password")
 	dbNumber := viper.GetInt("redis.dbNumber")
 
 	rdx := redis.NewClient(&redis.Options{
 		Addr:     addr,
-		Username: username,
-		Password: password,
 		DB:       dbNumber,
+		PoolSize: 2000,
 	})
 	// 测试redis是否可以正常连接
 	ctx := context.Background()
 
 	if err := rdx.Ping(ctx).Err(); err != nil {
-        panic("failed to connect to redis server, err: " + err.Error())
-    }
+		panic("failed to connect to redis server, err: " + err.Error())
+	}
 
 	Rdx = rdx
 }

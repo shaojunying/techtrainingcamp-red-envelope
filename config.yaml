@@ -13,7 +13,7 @@ database:
   #每个连接的生命周期 单位秒
   ConnMaxLifeTime: 300
 redis:
-  addr: redis-cn02jdaqbqmj56pxs.redis.ivolces.com:6379
+  addr: redis:6379
   username: developer
   password: Group1234.
   dbNumber: 0

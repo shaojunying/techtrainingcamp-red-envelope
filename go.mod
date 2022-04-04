@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/apache/rocketmq-client-go/v2 v2.1.0
 	github.com/gin-contrib/cors v1.3.1
+	github.com/gin-contrib/pprof v1.3.0
 	github.com/gin-gonic/gin v1.7.4
 	github.com/go-redis/redis/v8 v8.11.4
 	github.com/jinzhu/gorm v1.9.16
