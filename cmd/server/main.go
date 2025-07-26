@@ -4,9 +4,9 @@ import (
 	"github.com/spf13/viper"
 	"log"
 	"net/http"
-	"red_envelope/config"
-	"red_envelope/database"
-	"red_envelope/routers"
+	"red_envelope/internal/app"
+	"red_envelope/internal/infrastructure/database"
+	"red_envelope/internal/interface/http/router"
 )
 
 func main() {
@@ -15,7 +15,7 @@ func main() {
 	}()
 
 	//读取配置
-	config.InitConf()
+	app.InitConf()
 
 	//启动数据库
 	//db := database.InitDB()
@@ -29,7 +29,7 @@ func main() {
 	}
 	defer database.CloseMQ()
 
-	r := routers.InitRouter()
+	r := router.InitRouter()
 
 	port := viper.GetString("server.port")
 	r.Run(":" + port)

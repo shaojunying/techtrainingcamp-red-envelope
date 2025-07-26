@@ -1,10 +1,10 @@
-package redenvelope
+package envelope
 
 import (
 	"errors"
 	"fmt"
 	"github.com/gin-gonic/gin"
-	"red_envelope/database"
+	"red_envelope/internal/infrastructure/database"
 	"strconv"
 	"time"
 

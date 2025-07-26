@@ -1,4 +1,4 @@
-package redenvelope
+package envelope
 
 import "github.com/gin-gonic/gin"
 

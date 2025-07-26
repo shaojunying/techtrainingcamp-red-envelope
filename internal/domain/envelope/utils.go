@@ -1,4 +1,4 @@
-package redenvelope
+package envelope
 
 //ConfigKey redis中配置参数的key
 var ConfigKey = "config"

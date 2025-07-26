@@ -1,4 +1,4 @@
-package redenvelope
+package envelope
 
 import (
 	"context"
@@ -7,7 +7,7 @@ import (
 	"github.com/apache/rocketmq-client-go/v2/primitive"
 	"log"
 	"math/rand"
-	"red_envelope/database"
+	"red_envelope/internal/infrastructure/database"
 	"time"
 )
 

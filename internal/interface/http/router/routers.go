@@ -1,12 +1,12 @@
-package routers
+package router
 
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/spf13/viper"
-	"red_envelope/api/redenvelope"
-	"red_envelope/middleware"
+	"red_envelope/internal/domain/envelope"
+	"red_envelope/internal/app/middleware"
 )
 
 func InitRouter() *gin.Engine {
@@ -35,10 +35,10 @@ func setUpRouter(router *gin.Engine, milliseconds int64) {
 	otherApi := router.Group("/")
 
 	// 这组路由不走防作弊检查
-	redenvelope.RegisterOtherRouter(otherApi.Group("/redenvelope"))
+	envelope.RegisterOtherRouter(otherApi.Group("/redenvelope"))
 
 	//router.Use(middleware.CheatPreventingMiddleware(milliseconds))
 	router.Use(middleware.ConfigLoadingMiddleware())
 	coreApi := router.Group("/")
-	redenvelope.RegisterRedEnvelopeRouter(coreApi.Group("/redenvelope"))
+	envelope.RegisterRedEnvelopeRouter(coreApi.Group("/redenvelope"))
 }

@@ -1,4 +1,4 @@
-package redenvelope
+package envelope
 
 //type User struct {
 //	UID    *int `json:"uid"`

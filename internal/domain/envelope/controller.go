@@ -1,4 +1,4 @@
-package redenvelope
+package envelope
 
 import (
 	"errors"
