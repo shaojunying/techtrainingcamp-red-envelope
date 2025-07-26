@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1200" height="800" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font-family: Arial, sans-serif; font-size: 18px; font-weight: bold; fill: #333; }
+      .step-title { font-family: Arial, sans-serif; font-size: 14px; font-weight: bold; fill: #333; }
+      .step-text { font-family: Arial, sans-serif; font-size: 11px; fill: #333; }
+      .process-box { fill: #e3f2fd; stroke: #1976d2; stroke-width: 2; rx: 8; }
+      .decision-box { fill: #fff3e0; stroke: #f57c00; stroke-width: 2; }
+      .data-box { fill: #e8f5e8; stroke: #388e3c; stroke-width: 2; rx: 5; }
+      .arrow { stroke: #666; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .success-arrow { stroke: #4caf50; stroke-width: 2; fill: none; marker-end: url(#arrowhead-green); }
+      .fail-arrow { stroke: #f44336; stroke-width: 2; fill: none; marker-end: url(#arrowhead-red); }
+      .async-arrow { stroke: #9c27b0; stroke-width: 2; fill: none; marker-end: url(#arrowhead-purple); stroke-dasharray: 5,5; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#666" />
+    </marker>
+    <marker id="arrowhead-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#4caf50" />
+    </marker>
+    <marker id="arrowhead-red" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#f44336" />
+    </marker>
+    <marker id="arrowhead-purple" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#9c27b0" />
+    </marker>
+  </defs>
+  
+  <!-- Title -->
+  <text x="500" y="30" text-anchor="middle" class="title">红包雨系统数据流程图</text>
+  
+  <!-- Step 1: User Request -->
+  <rect x="50" y="60" width="120" height="50" class="process-box"/>
+  <text x="110" y="80" text-anchor="middle" class="step-title">用户请求</text>
+  <text x="110" y="95" text-anchor="middle" class="step-text">POST /snatch</text>
+  <text x="110" y="105" text-anchor="middle" class="step-text">uid: 123</text>
+  
+  <!-- Step 2: Rate Limiting -->
+  <polygon points="220,60 280,85 220,110 160,85" class="decision-box"/>
+  <text x="220" y="82" text-anchor="middle" class="step-title">限流检查</text>
+  <text x="220" y="95" text-anchor="middle" class="step-text">令牌桶</text>
+  
+  <!-- Step 3: Anti-Cheat -->
+  <polygon points="350,60 410,85 350,110 290,85" class="decision-box"/>
+  <text x="350" y="82" text-anchor="middle" class="step-title">反作弊检查</text>
+  <text x="350" y="95" text-anchor="middle" class="step-text">时间间隔</text>
+  
+  <!-- Step 4: Business Logic -->
+  <rect x="450" y="60" width="120" height="50" class="process-box"/>
+  <text x="510" y="80" text-anchor="middle" class="step-title">业务逻辑</text>
+  <text x="510" y="95" text-anchor="middle" class="step-text">抢红包服务</text>
+  
+  <!-- Step 5: Check User Limit -->
+  <polygon points="620,60 680,85 620,110 560,85" class="decision-box"/>
+  <text x="620" y="75" text-anchor="middle" class="step-title">用户限制</text>
+  <text x="620" y="88" text-anchor="middle" class="step-text">检查次数</text>
+  <text x="620" y="100" text-anchor="middle" class="step-text">Redis缓存</text>
+  
+  <!-- Step 6: Probability Check -->
+  <polygon points="750,60 810,85 750,110 690,85" class="decision-box"/>
+  <text x="750" y="82" text-anchor="middle" class="step-title">概率检查</text>
+  <text x="750" y="95" text-anchor="middle" class="step-text">70%成功率</text>
+  
+  <!-- Cache Layer -->
+  <rect x="50" y="180" width="100" height="40" class="data-box"/>
+  <text x="100" y="205" text-anchor="middle" class="step-text">Redis缓存</text>
+  
+  <!-- Database Layer -->
+  <rect x="200" y="180" width="100" height="40" class="data-box"/>
+  <text x="250" y="205" text-anchor="middle" class="step-text">MySQL数据库</text>
+  
+  <!-- Message Queue -->
+  <rect x="350" y="180" width="100" height="40" class="data-box"/>
+  <text x="400" y="205" text-anchor="middle" class="step-text">RocketMQ</text>
+  
+  <!-- Generate Envelope -->
+  <rect x="500" y="180" width="120" height="40" class="process-box"/>
+  <text x="560" y="205" text-anchor="middle" class="step-text">生成红包记录</text>
+  
+  <!-- Success Response -->
+  <rect x="700" y="180" width="100" height="40" class="process-box"/>
+  <text x="750" y="205" text-anchor="middle" class="step-text">返回成功</text>
+  
+  <!-- Fail Responses -->
+  <rect x="50" y="280" width="100" height="30" class="process-box"/>
+  <text x="100" y="300" text-anchor="middle" class="step-text">限流失败</text>
+  
+  <rect x="200" y="280" width="100" height="30" class="process-box"/>
+  <text x="250" y="300" text-anchor="middle" class="step-text">反作弊失败</text>
+  
+  <rect x="350" y="280" width="100" height="30" class="process-box"/>
+  <text x="400" y="300" text-anchor="middle" class="step-text">次数超限</text>
+  
+  <rect x="500" y="280" width="100" height="30" class="process-box"/>
+  <text x="550" y="300" text-anchor="middle" class="step-text">概率失败</text>
+  
+  <!-- Consumer Services -->
+  <rect x="50" y="350" width="100" height="40" class="process-box"/>
+  <text x="100" y="375" text-anchor="middle" class="step-text">Consumer1</text>
+  
+  <rect x="200" y="350" width="100" height="40" class="process-box"/>
+  <text x="250" y="375" text-anchor="middle" class="step-text">Consumer2</text>
+  
+  <!-- Open Envelope Flow -->
+  <rect x="400" y="350" width="120" height="40" class="process-box"/>
+  <text x="460" y="370" text-anchor="middle" class="step-title">开红包流程</text>
+  <text x="460" y="385" text-anchor="middle" class="step-text">POST /open</text>
+  
+  <polygon points="570,350 630,375 570,400 510,375" class="decision-box"/>
+  <text x="570" y="370" text-anchor="middle" class="step-text">验证红包</text>
+  <text x="570" y="383" text-anchor="middle" class="step-text">是否已开启</text>
+  
+  <rect x="680" y="350" width="100" height="40" class="process-box"/>
+  <text x="730" y="375" text-anchor="middle" class="step-text">更新状态</text>
+  
+  <!-- Wallet Flow -->
+  <rect x="400" y="450" width="120" height="40" class="process-box"/>
+  <text x="460" y="470" text-anchor="middle" class="step-title">钱包查询</text>
+  <text x="460" y="485" text-anchor="middle" class="step-text">GET /wallet</text>
+  
+  <rect x="570" y="450" width="120" height="40" class="process-box"/>
+  <text x="630" y="475" text-anchor="middle" class="step-text">查询用户红包</text>
+  
+  <rect x="730" y="450" width="100" height="40" class="process-box"/>
+  <text x="780" y="475" text-anchor="middle" class="step-text">返回列表</text>
+  
+  <!-- Flow Arrows -->
+  <!-- Main flow -->
+  <line x1="170" y1="85" x2="160" y2="85" class="arrow"/>
+  <line x1="280" y1="85" x2="290" y2="85" class="arrow"/>
+  <line x1="410" y1="85" x2="450" y2="85" class="arrow"/>
+  <line x1="570" y1="85" x2="560" y2="85" class="arrow"/>
+  <line x1="680" y1="85" x2="690" y2="85" class="arrow"/>
+  
+  <!-- Success path -->
+  <line x1="750" y1="110" x2="750" y2="180" class="success-arrow"/>
+  <line x1="620" y1="110" x2="560" y2="180" class="success-arrow"/>
+  
+  <!-- Fail paths -->
+  <line x1="220" y1="110" x2="100" y2="280" class="fail-arrow"/>
+  <line x1="350" y1="110" x2="250" y2="280" class="fail-arrow"/>
+  <line x1="620" y1="110" x2="400" y2="280" class="fail-arrow"/>
+  <line x1="750" y1="110" x2="550" y2="280" class="fail-arrow"/>
+  
+  <!-- Database interactions -->
+  <line x1="510" y1="110" x2="100" y2="180" class="arrow"/>
+  <line x1="510" y1="110" x2="250" y2="180" class="arrow"/>
+  
+  <!-- Async message -->
+  <line x1="560" y1="220" x2="400" y2="220" class="async-arrow"/>
+  <line x1="400" y1="220" x2="100" y2="350" class="async-arrow"/>
+  <line x1="400" y1="220" x2="250" y2="350" class="async-arrow"/>
+  
+  <!-- Open envelope flow -->
+  <line x1="520" y1="375" x2="510" y2="375" class="arrow"/>
+  <line x1="630" y1="375" x2="680" y2="375" class="arrow"/>
+  
+  <!-- Wallet flow -->
+  <line x1="520" y1="470" x2="570" y2="470" class="arrow"/>
+  <line x1="690" y1="470" x2="730" y2="470" class="arrow"/>
+  
+  <!-- Legend -->
+  <text x="50" y="550" class="step-title">图例:</text>
+  <line x1="50" y1="570" x2="100" y2="570" class="arrow"/>
+  <text x="110" y="575" class="step-text">同步调用</text>
+  
+  <line x1="50" y1="590" x2="100" y2="590" class="success-arrow"/>
+  <text x="110" y="595" class="step-text">成功路径</text>
+  
+  <line x1="50" y1="610" x2="100" y2="610" class="fail-arrow"/>
+  <text x="110" y="615" class="step-text">失败路径</text>
+  
+  <line x1="50" y1="630" x2="100" y2="630" class="async-arrow"/>
+  <text x="110" y="635" class="step-text">异步消息</text>
+  
+  <!-- Performance Metrics -->
+  <text x="500" y="550" class="step-title">性能指标:</text>
+  <text x="500" y="570" class="step-text">• 限流: 5000 QPS</text>
+  <text x="500" y="585" class="step-text">• 反作弊: 1秒间隔</text>
+  <text x="500" y="600" class="step-text">• 成功概率: 70%</text>
+  <text x="500" y="615" class="step-text">• 用户限制: 5次/人</text>
+  <text x="500" y="630" class="step-text">• Redis缓存: 用户状态</text>
+  <text x="500" y="645" class="step-text">• MySQL: 红包记录</text>
+</svg>

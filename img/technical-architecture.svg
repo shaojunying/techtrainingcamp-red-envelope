@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1400" height="900" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <style>
+      .title { font-family: 'Segoe UI', Arial, sans-serif; font-size: 20px; font-weight: bold; fill: #2c3e50; }
+      .layer-title { font-family: 'Segoe UI', Arial, sans-serif; font-size: 15px; font-weight: bold; fill: #34495e; }
+      .component-title { font-family: 'Segoe UI', Arial, sans-serif; font-size: 13px; font-weight: 600; fill: #2c3e50; }
+      .component-desc { font-family: 'Segoe UI', Arial, sans-serif; font-size: 10px; fill: #7f8c8d; }
+      .api-text { font-family: 'Consolas', monospace; font-size: 11px; fill: #2c3e50; }
+      
+      .client-box { fill: #ecf0f1; stroke: #95a5a6; stroke-width: 2; rx: 8; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1)); }
+      .balancer-box { fill: #e8f5e8; stroke: #27ae60; stroke-width: 2; rx: 8; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1)); }
+      .app-box { fill: #e3f2fd; stroke: #3498db; stroke-width: 2; rx: 8; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1)); }
+      .middleware-box { fill: #fff3e0; stroke: #f39c12; stroke-width: 2; rx: 8; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1)); }
+      .service-box { fill: #e8f5e8; stroke: #2ecc71; stroke-width: 2; rx: 8; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1)); }
+      .data-box { fill: #fdf2e9; stroke: #e67e22; stroke-width: 2; rx: 8; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1)); }
+      .storage-box { fill: #fdedec; stroke: #e74c3c; stroke-width: 2; rx: 8; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1)); }
+      .consumer-box { fill: #f4ecf7; stroke: #8e44ad; stroke-width: 2; rx: 8; filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.1)); }
+      
+      .layer-bg { fill: #fafbfc; stroke: #bdc3c7; stroke-width: 1; rx: 12; opacity: 0.8; }
+      .arrow { stroke: #34495e; stroke-width: 2; fill: none; marker-end: url(#arrowhead); }
+      .flow-arrow { stroke: #3498db; stroke-width: 2; fill: none; marker-end: url(#arrowhead-blue); }
+    </style>
+    
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#34495e" />
+    </marker>
+    <marker id="arrowhead-blue" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#3498db" />
+    </marker>
+  </defs>
+  
+  <!-- Title -->
+  <text x="700" y="35" text-anchor="middle" class="title">红包雨系统技术架构图</text>
+  
+  <!-- Client Layer Background -->
+  <rect x="50" y="70" width="1300" height="100" class="layer-bg"/>
+  <text x="80" y="95" class="layer-title">客户端层 (Client Layer)</text>
+  
+  <!-- Client Components -->
+  <rect x="200" y="110" width="140" height="50" class="client-box"/>
+  <text x="270" y="130" text-anchor="middle" class="component-title">Web客户端</text>
+  <text x="270" y="145" text-anchor="middle" class="component-desc">浏览器/H5页面</text>
+  
+  <rect x="380" y="110" width="140" height="50" class="client-box"/>
+  <text x="450" y="130" text-anchor="middle" class="component-title">移动客户端</text>
+  <text x="450" y="145" text-anchor="middle" class="component-desc">iOS/Android App</text>
+  
+  <rect x="560" y="110" width="140" height="50" class="client-box"/>
+  <text x="630" y="130" text-anchor="middle" class="component-title">压测工具</text>
+  <text x="630" y="145" text-anchor="middle" class="component-desc">wrk/JMeter等</text>
+  
+  <!-- Load Balancer Layer -->
+  <rect x="50" y="190" width="1300" height="100" class="layer-bg"/>
+  <text x="80" y="215" class="layer-title">负载均衡层 (Load Balancer)</text>
+  
+  <rect x="580" y="230" width="160" height="50" class="balancer-box"/>
+  <text x="660" y="250" text-anchor="middle" class="component-title">负载均衡器</text>
+  <text x="660" y="265" text-anchor="middle" class="component-desc">Nginx/HAProxy</text>
+  
+  <!-- Application Layer -->
+  <rect x="50" y="310" width="1300" height="180" class="layer-bg"/>
+  <text x="80" y="335" class="layer-title">应用层 (Application Layer)</text>
+  
+  <!-- Gin Router -->
+  <rect x="120" y="360" width="140" height="50" class="app-box"/>
+  <text x="190" y="380" text-anchor="middle" class="component-title">Gin路由器</text>
+  <text x="190" y="395" text-anchor="middle" class="component-desc">HTTP路由分发</text>
+  
+  <!-- Middleware Column -->
+  <rect x="320" y="350" width="140" height="35" class="middleware-box"/>
+  <text x="390" y="372" text-anchor="middle" class="component-title">CORS中间件</text>
+  
+  <rect x="320" y="395" width="140" height="35" class="middleware-box"/>
+  <text x="390" y="417" text-anchor="middle" class="component-title">限流中间件</text>
+  
+  <rect x="320" y="440" width="140" height="35" class="middleware-box"/>
+  <text x="390" y="462" text-anchor="middle" class="component-title">反作弊中间件</text>
+  
+  <!-- Controllers -->
+  <rect x="520" y="360" width="140" height="50" class="service-box"/>
+  <text x="590" y="380" text-anchor="middle" class="component-title">红包控制器</text>
+  <text x="590" y="395" text-anchor="middle" class="component-desc">API接口层</text>
+  
+  <!-- Monitoring -->
+  <rect x="720" y="360" width="140" height="50" class="app-box"/>
+  <text x="790" y="380" text-anchor="middle" class="component-title">性能监控</text>
+  <text x="790" y="395" text-anchor="middle" class="component-desc">pprof监控面板</text>
+  
+  <!-- Business Layer -->
+  <rect x="50" y="510" width="1300" height="120" class="layer-bg"/>
+  <text x="80" y="535" class="layer-title">业务逻辑层 (Business Layer)</text>
+  
+  <!-- Service Components -->
+  <rect x="120" y="560" width="120" height="50" class="service-box"/>
+  <text x="180" y="580" text-anchor="middle" class="component-title">抢红包</text>
+  <text x="180" y="595" text-anchor="middle" class="component-desc">概率分配</text>
+  
+  <rect x="260" y="560" width="120" height="50" class="service-box"/>
+  <text x="320" y="580" text-anchor="middle" class="component-title">开红包</text>
+  <text x="320" y="595" text-anchor="middle" class="component-desc">金额计算</text>
+  
+  <rect x="400" y="560" width="120" height="50" class="service-box"/>
+  <text x="460" y="580" text-anchor="middle" class="component-title">钱包服务</text>
+  <text x="460" y="595" text-anchor="middle" class="component-desc">记录查询</text>
+  
+  <rect x="540" y="560" width="120" height="50" class="service-box"/>
+  <text x="600" y="580" text-anchor="middle" class="component-title">配置服务</text>
+  <text x="600" y="595" text-anchor="middle" class="component-desc">参数管理</text>
+  
+  <rect x="680" y="560" width="120" height="50" class="service-box"/>
+  <text x="740" y="580" text-anchor="middle" class="component-title">反作弊</text>
+  <text x="740" y="595" text-anchor="middle" class="component-desc">频率检查</text>
+  
+  <!-- Data Access Layer -->
+  <rect x="50" y="650" width="1300" height="100" class="layer-bg"/>
+  <text x="80" y="675" class="layer-title">数据访问层 (Data Access Layer)</text>
+  
+  <rect x="200" y="690" width="140" height="50" class="data-box"/>
+  <text x="270" y="710" text-anchor="middle" class="component-title">MySQL客户端</text>
+  <text x="270" y="725" text-anchor="middle" class="component-desc">GORM数据访问</text>
+  
+  <rect x="370" y="690" width="140" height="50" class="data-box"/>
+  <text x="440" y="710" text-anchor="middle" class="component-title">Redis客户端</text>
+  <text x="440" y="725" text-anchor="middle" class="component-desc">缓存操作</text>
+  
+  <rect x="540" y="690" width="140" height="50" class="data-box"/>
+  <text x="610" y="710" text-anchor="middle" class="component-title">MQ生产者</text>
+  <text x="610" y="725" text-anchor="middle" class="component-desc">消息发送</text>
+  
+  <!-- Consumer Services -->
+  <rect x="780" y="690" width="120" height="50" class="consumer-box"/>
+  <text x="840" y="710" text-anchor="middle" class="component-title">Consumer1</text>
+  <text x="840" y="725" text-anchor="middle" class="component-desc">异步处理</text>
+  
+  <rect x="920" y="690" width="120" height="50" class="consumer-box"/>
+  <text x="980" y="710" text-anchor="middle" class="component-title">Consumer2</text>
+  <text x="980" y="725" text-anchor="middle" class="component-desc">数据同步</text>
+  
+  <!-- Storage Layer -->
+  <rect x="50" y="770" width="1300" height="100" class="layer-bg"/>
+  <text x="80" y="795" class="layer-title">存储层 (Storage Layer)</text>
+  
+  <rect x="200" y="810" width="140" height="50" class="storage-box"/>
+  <text x="270" y="830" text-anchor="middle" class="component-title">MySQL数据库</text>
+  <text x="270" y="845" text-anchor="middle" class="component-desc">红包记录存储</text>
+  
+  <rect x="370" y="810" width="140" height="50" class="storage-box"/>
+  <text x="440" y="830" text-anchor="middle" class="component-title">Redis缓存</text>
+  <text x="440" y="845" text-anchor="middle" class="component-desc">用户状态缓存</text>
+  
+  <rect x="540" y="810" width="140" height="50" class="storage-box"/>
+  <text x="610" y="830" text-anchor="middle" class="component-title">RocketMQ</text>
+  <text x="610" y="845" text-anchor="middle" class="component-desc">消息队列</text>
+  
+  <rect x="850" y="810" width="140" height="50" class="storage-box"/>
+  <text x="920" y="830" text-anchor="middle" class="component-title">消费者数据库</text>
+  <text x="920" y="845" text-anchor="middle" class="component-desc">业务数据存储</text>
+  
+  <!-- API Documentation -->
+  <rect x="1120" y="350" width="200" height="140" class="layer-bg"/>
+  <text x="1130" y="370" class="layer-title">主要API接口</text>
+  <text x="1130" y="390" class="api-text">POST /redenvelope/snatch</text>
+  <text x="1130" y="405" class="api-text">POST /redenvelope/open</text>
+  <text x="1130" y="420" class="api-text">POST /redenvelope/get_wallet_list</text>
+  <text x="1130" y="435" class="api-text">POST /redenvelope/config</text>
+  <text x="1130" y="450" class="api-text">GET  /redenvelope/wrktest</text>
+  <text x="1130" y="470" class="component-desc">性能监控:</text>
+  <text x="1130" y="485" class="api-text">GET  /debug/pprof/*</text>
+  
+  <!-- Data Flow Arrows -->
+  <!-- Client to Load Balancer -->
+  <line x1="270" y1="160" x2="620" y2="230" class="flow-arrow"/>
+  <line x1="450" y1="160" x2="650" y2="230" class="flow-arrow"/>
+  <line x1="630" y1="160" x2="680" y2="230" class="flow-arrow"/>
+  
+  <!-- Load Balancer to Router -->
+  <line x1="660" y1="280" x2="190" y2="360" class="flow-arrow"/>
+  
+  <!-- Router to Middleware -->
+  <line x1="260" y1="385" x2="320" y2="385" class="flow-arrow"/>
+  
+  <!-- Middleware to Controller -->
+  <line x1="460" y1="385" x2="520" y2="385" class="flow-arrow"/>
+  
+  <!-- Controller to Services (vertical lines to avoid crossing) -->
+  <line x1="590" y1="410" x2="590" y2="480" class="flow-arrow"/>
+  <line x1="590" y1="480" x2="180" y2="480" class="flow-arrow"/>
+  <line x1="180" y1="480" x2="180" y2="560" class="flow-arrow"/>
+  
+  <line x1="590" y1="480" x2="320" y2="480" class="flow-arrow"/>
+  <line x1="320" y1="480" x2="320" y2="560" class="flow-arrow"/>
+  
+  <line x1="590" y1="480" x2="460" y2="480" class="flow-arrow"/>
+  <line x1="460" y1="480" x2="460" y2="560" class="flow-arrow"/>
+  
+  <line x1="590" y1="480" x2="600" y2="480" class="flow-arrow"/>
+  <line x1="600" y1="480" x2="600" y2="560" class="flow-arrow"/>
+  
+  <line x1="590" y1="480" x2="740" y2="480" class="flow-arrow"/>
+  <line x1="740" y1="480" x2="740" y2="560" class="flow-arrow"/>
+  
+  <!-- Services to Data Access -->
+  <line x1="270" y1="630" x2="270" y2="690" class="flow-arrow"/>
+  <line x1="440" y1="630" x2="440" y2="690" class="flow-arrow"/>
+  <line x1="610" y1="630" x2="610" y2="690" class="flow-arrow"/>
+  
+  <!-- Data Access to Storage -->
+  <line x1="270" y1="740" x2="270" y2="810" class="flow-arrow"/>
+  <line x1="440" y1="740" x2="440" y2="810" class="flow-arrow"/>
+  <line x1="610" y1="740" x2="610" y2="810" class="flow-arrow"/>
+  
+  <!-- MQ to Consumers -->
+  <line x1="680" y1="715" x2="780" y2="715" class="flow-arrow"/>
+  <line x1="680" y1="715" x2="920" y2="715" class="flow-arrow"/>
+  
+  <!-- Consumers to Database -->
+  <line x1="890" y1="740" x2="890" y2="780" class="flow-arrow"/>
+  <line x1="890" y1="780" x2="920" y2="780" class="flow-arrow"/>
+  <line x1="920" y1="780" x2="920" y2="810" class="flow-arrow"/>
+  
+  <line x1="1030" y1="740" x2="1030" y2="780" class="flow-arrow"/>
+  <line x1="1030" y1="780" x2="950" y2="780" class="flow-arrow"/>
+</svg>
